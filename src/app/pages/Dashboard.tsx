@@ -8,9 +8,12 @@ import {
   Wallet,
   AlertTriangle,
   ArrowRight,
+  CalendarRange,
+  Receipt,
+  PackageSearch,
 } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
 import { formatCurrency } from '../lib/utils';
 import { Link } from 'react-router';
@@ -148,26 +151,108 @@ export default function Dashboard() {
     ];
   }, [data.kpis]);
 
+  const quickActions = [
+    {
+      title: 'Registrar trabajo',
+      description: 'Ingresa un nuevo trabajo y su adelanto inicial.',
+      to: '/dashboard/trabajos',
+      icon: Briefcase,
+    },
+    {
+      title: 'Registrar pago',
+      description: 'Carga un cobro y actualiza la caja al instante.',
+      to: '/dashboard/pagos',
+      icon: Receipt,
+    },
+    {
+      title: 'Ver calendario',
+      description: 'Revisa entregas e instalaciones programadas.',
+      to: '/dashboard/calendario',
+      icon: CalendarRange,
+    },
+    {
+      title: 'Controlar inventario',
+      description: 'Consulta stock bajo y movimientos recientes.',
+      to: '/dashboard/inventario',
+      icon: PackageSearch,
+    },
+  ];
+
   return (
-    <div className="p-6 space-y-6">
+    <div className="space-y-6 p-6">
+      <section className="overflow-hidden rounded-3xl border border-slate-200 bg-gradient-to-br from-slate-900 via-blue-950 to-sky-900 text-white shadow-xl">
+        <div className="grid gap-8 px-6 py-7 lg:grid-cols-[1.5fr_1fr] lg:px-8">
+          <div className="space-y-5">
+            <div className="inline-flex items-center rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-medium uppercase tracking-[0.2em] text-sky-100">
+              Panel general del negocio
+            </div>
+            <div className="space-y-3">
+              <h1 className="text-3xl font-semibold tracking-tight text-white md:text-4xl">
+                Control diario para una vidrieria en una sola vista
+              </h1>
+              <p className="max-w-2xl text-sm leading-6 text-slate-200 md:text-base">
+                Revisa el movimiento del dia, detecta alertas de stock y valida rapido el ritmo de ingresos, gastos y trabajos.
+              </p>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-3">
+              <div className="rounded-2xl border border-white/10 bg-white/10 p-4 backdrop-blur-sm">
+                <p className="text-xs uppercase tracking-[0.18em] text-slate-300">Caja actual</p>
+                <p className="mt-2 text-2xl font-semibold text-white">{formatCurrency(data.kpis.saldoCaja)}</p>
+              </div>
+              <div className="rounded-2xl border border-white/10 bg-white/10 p-4 backdrop-blur-sm">
+                <p className="text-xs uppercase tracking-[0.18em] text-slate-300">Trabajos pendientes</p>
+                <p className="mt-2 text-2xl font-semibold text-white">{data.kpis.trabajosPendientes}</p>
+              </div>
+              <div className="rounded-2xl border border-white/10 bg-white/10 p-4 backdrop-blur-sm">
+                <p className="text-xs uppercase tracking-[0.18em] text-slate-300">Stock bajo</p>
+                <p className="mt-2 text-2xl font-semibold text-white">{data.kpis.stockBajo}</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid gap-3 self-start">
+            {quickActions.map((action) => {
+              const Icon = action.icon;
+              return (
+                <Link
+                  key={action.title}
+                  to={action.to}
+                  className="group rounded-2xl border border-white/12 bg-white/8 p-4 transition hover:border-white/25 hover:bg-white/12"
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <p className="text-sm font-semibold text-white">{action.title}</p>
+                      <p className="mt-1 text-sm leading-5 text-slate-300">{action.description}</p>
+                    </div>
+                    <div className="rounded-xl bg-white/10 p-3 text-sky-100 transition group-hover:bg-white/15">
+                      <Icon className="h-5 w-5" />
+                    </div>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-        <p className="text-sm text-gray-600 mt-1">Resumen general del negocio</p>
+        <h2 className="text-xl font-semibold text-slate-900">Indicadores clave</h2>
+        <p className="mt-1 text-sm text-slate-600">Una lectura rapida del estado operativo y financiero.</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {kpiData.map((kpi) => {
           const Icon = kpi.icon;
           return (
-            <Card key={kpi.title}>
+            <Card key={kpi.title} className="overflow-hidden border-slate-200/80 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
               <CardContent className="p-6">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
-                    <p className="text-sm text-gray-600 mb-1">{kpi.title}</p>
-                    <p className="text-2xl font-bold text-gray-900 mb-2">{kpi.value}</p>
-                    <p className="text-xs text-gray-500">{kpi.change}</p>
+                    <p className="mb-1 text-sm text-slate-500">{kpi.title}</p>
+                    <p className="mb-2 text-2xl font-bold text-slate-900">{kpi.value}</p>
+                    <p className="text-xs uppercase tracking-wide text-slate-400">{kpi.change}</p>
                   </div>
-                  <div className={`w-12 h-12 ${kpi.bg} rounded-lg flex items-center justify-center flex-shrink-0`}>
+                  <div className={`flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl ${kpi.bg} ring-1 ring-inset ring-white/60`}>
                     <Icon className={`w-6 h-6 ${kpi.color}`} />
                   </div>
                 </div>
@@ -177,17 +262,18 @@ export default function Dashboard() {
         })}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <Card className="lg:col-span-2">
-          <CardHeader>
-            <CardTitle>Ingresos vs Gastos (ultimos 3 meses)</CardTitle>
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <Card className="lg:col-span-2 border-slate-200/80 shadow-sm">
+          <CardHeader className="border-b border-slate-100 pb-4">
+            <CardTitle>Ingresos vs gastos</CardTitle>
+            <CardDescription>Comparativo de los ultimos 3 meses para ver tendencia y margen.</CardDescription>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={data.chartData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="mes" />
-                <YAxis />
+                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
+                <XAxis dataKey="mes" tickLine={false} axisLine={false} />
+                <YAxis tickLine={false} axisLine={false} />
                 <Tooltip formatter={(value) => formatCurrency(Number(value))} />
                 <Legend />
                 <Bar dataKey="ingresos" fill="#10b981" name="Ingresos" />
@@ -197,17 +283,18 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
+        <Card className="border-slate-200/80 shadow-sm">
+          <CardHeader className="border-b border-slate-100 pb-4">
             <CardTitle>Alertas importantes</CardTitle>
+            <CardDescription>Eventos que vale la pena revisar hoy antes de cerrar caja.</CardDescription>
           </CardHeader>
           <CardContent>
             {data.alertas.length === 0 && !isLoading ? (
-              <div className="rounded-lg border border-gray-200 bg-gray-50 p-3 text-sm text-gray-600">
+              <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
                 No hay alertas activas por ahora.
               </div>
             ) : (
-              <div className="space-y-3">
+              <div className="space-y-3 pt-1">
                 {data.alertas.map((alerta, index) => (
                   <div
                     key={`${alerta.tipo}-${index}`}
@@ -228,11 +315,14 @@ export default function Dashboard() {
         </Card>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle>Ultimos trabajos</CardTitle>
-            <Link to="/dashboard/trabajos" className="text-sm text-blue-600 hover:text-blue-700 flex items-center gap-1">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <Card className="border-slate-200/80 shadow-sm">
+          <CardHeader className="flex flex-row items-center justify-between border-b border-slate-100 pb-4">
+            <div>
+              <CardTitle>Ultimos trabajos</CardTitle>
+              <CardDescription>Los registros mas recientes para seguimiento rapido.</CardDescription>
+            </div>
+            <Link to="/dashboard/trabajos" className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-700">
               Ver todos <ArrowRight className="w-4 h-4" />
             </Link>
           </CardHeader>
@@ -240,25 +330,25 @@ export default function Dashboard() {
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-gray-200">
-                    <th className="text-left text-xs font-medium text-gray-500 pb-3">Cliente</th>
-                    <th className="text-left text-xs font-medium text-gray-500 pb-3">Descripcion</th>
-                    <th className="text-right text-xs font-medium text-gray-500 pb-3">Total</th>
-                    <th className="text-left text-xs font-medium text-gray-500 pb-3">Estado</th>
+                  <tr className="border-b border-slate-200">
+                    <th className="pb-3 text-left text-xs font-medium uppercase tracking-wide text-slate-500">Cliente</th>
+                    <th className="pb-3 text-left text-xs font-medium uppercase tracking-wide text-slate-500">Descripcion</th>
+                    <th className="pb-3 text-right text-xs font-medium uppercase tracking-wide text-slate-500">Total</th>
+                    <th className="pb-3 text-left text-xs font-medium uppercase tracking-wide text-slate-500">Estado</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-200">
+                <tbody className="divide-y divide-slate-200">
                   {data.recentTrabajos.map((trabajo) => (
-                    <tr key={trabajo.id} className="hover:bg-gray-50">
-                      <td className="py-3 text-sm text-gray-900">{trabajo.cliente}</td>
-                      <td className="py-3 text-sm text-gray-600">{trabajo.descripcion}</td>
-                      <td className="py-3 text-sm text-gray-900 text-right">{formatCurrency(trabajo.total)}</td>
+                    <tr key={trabajo.id} className="hover:bg-slate-50/80">
+                      <td className="py-3 text-sm text-slate-900">{trabajo.cliente}</td>
+                      <td className="py-3 text-sm text-slate-600">{trabajo.descripcion}</td>
+                      <td className="py-3 text-right text-sm font-medium text-slate-900">{formatCurrency(trabajo.total)}</td>
                       <td className="py-3">{getEstadoBadge(trabajo.estado)}</td>
                     </tr>
                   ))}
                   {!isLoading && data.recentTrabajos.length === 0 ? (
                     <tr>
-                      <td colSpan={4} className="py-8 text-center text-sm text-gray-500">
+                      <td colSpan={4} className="py-8 text-center text-sm text-slate-500">
                         No hay trabajos recientes.
                       </td>
                     </tr>
@@ -269,10 +359,13 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle>Pagos recientes</CardTitle>
-            <Link to="/dashboard/pagos" className="text-sm text-blue-600 hover:text-blue-700 flex items-center gap-1">
+        <Card className="border-slate-200/80 shadow-sm">
+          <CardHeader className="flex flex-row items-center justify-between border-b border-slate-100 pb-4">
+            <div>
+              <CardTitle>Pagos recientes</CardTitle>
+              <CardDescription>Ultimos ingresos registrados en el sistema.</CardDescription>
+            </div>
+            <Link to="/dashboard/pagos" className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-700">
               Ver todos <ArrowRight className="w-4 h-4" />
             </Link>
           </CardHeader>
@@ -280,25 +373,25 @@ export default function Dashboard() {
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-gray-200">
-                    <th className="text-left text-xs font-medium text-gray-500 pb-3">Cliente</th>
-                    <th className="text-left text-xs font-medium text-gray-500 pb-3">Tipo</th>
-                    <th className="text-right text-xs font-medium text-gray-500 pb-3">Monto</th>
-                    <th className="text-left text-xs font-medium text-gray-500 pb-3">Metodo</th>
+                  <tr className="border-b border-slate-200">
+                    <th className="pb-3 text-left text-xs font-medium uppercase tracking-wide text-slate-500">Cliente</th>
+                    <th className="pb-3 text-left text-xs font-medium uppercase tracking-wide text-slate-500">Tipo</th>
+                    <th className="pb-3 text-right text-xs font-medium uppercase tracking-wide text-slate-500">Monto</th>
+                    <th className="pb-3 text-left text-xs font-medium uppercase tracking-wide text-slate-500">Metodo</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-200">
+                <tbody className="divide-y divide-slate-200">
                   {data.recentPagos.map((pago) => (
-                    <tr key={pago.id} className="hover:bg-gray-50">
-                      <td className="py-3 text-sm text-gray-900">{pago.cliente}</td>
-                      <td className="py-3 text-sm text-gray-600">{pago.tipo}</td>
-                      <td className="py-3 text-sm text-green-600 text-right font-medium">{formatCurrency(pago.monto)}</td>
-                      <td className="py-3 text-sm text-gray-600">{pago.metodo}</td>
+                    <tr key={pago.id} className="hover:bg-slate-50/80">
+                      <td className="py-3 text-sm text-slate-900">{pago.cliente}</td>
+                      <td className="py-3 text-sm text-slate-600">{pago.tipo}</td>
+                      <td className="py-3 text-right text-sm font-medium text-green-600">{formatCurrency(pago.monto)}</td>
+                      <td className="py-3 text-sm text-slate-600">{pago.metodo}</td>
                     </tr>
                   ))}
                   {!isLoading && data.recentPagos.length === 0 ? (
                     <tr>
-                      <td colSpan={4} className="py-8 text-center text-sm text-gray-500">
+                      <td colSpan={4} className="py-8 text-center text-sm text-slate-500">
                         No hay pagos recientes.
                       </td>
                     </tr>
@@ -310,27 +403,28 @@ export default function Dashboard() {
         </Card>
       </div>
 
-      <Card>
-        <CardHeader>
+      <Card className="border-slate-200/80 shadow-sm">
+        <CardHeader className="border-b border-slate-100 pb-4">
           <CardTitle>Productos con stock bajo</CardTitle>
+          <CardDescription>Materiales que conviene reponer para no frenar trabajos pendientes.</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-gray-200">
-                  <th className="text-left text-xs font-medium text-gray-500 pb-3">Producto</th>
-                  <th className="text-center text-xs font-medium text-gray-500 pb-3">Stock actual</th>
-                  <th className="text-center text-xs font-medium text-gray-500 pb-3">Stock minimo</th>
-                  <th className="text-left text-xs font-medium text-gray-500 pb-3">Estado</th>
+                <tr className="border-b border-slate-200">
+                  <th className="pb-3 text-left text-xs font-medium uppercase tracking-wide text-slate-500">Producto</th>
+                  <th className="pb-3 text-center text-xs font-medium uppercase tracking-wide text-slate-500">Stock actual</th>
+                  <th className="pb-3 text-center text-xs font-medium uppercase tracking-wide text-slate-500">Stock minimo</th>
+                  <th className="pb-3 text-left text-xs font-medium uppercase tracking-wide text-slate-500">Estado</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200">
+              <tbody className="divide-y divide-slate-200">
                 {data.stockBajo.map((item) => (
-                  <tr key={item.id} className="hover:bg-gray-50">
-                    <td className="py-3 text-sm text-gray-900">{item.producto}</td>
-                    <td className="py-3 text-sm text-gray-900 text-center font-medium">{item.stock}</td>
-                    <td className="py-3 text-sm text-gray-600 text-center">{item.minimo}</td>
+                  <tr key={item.id} className="hover:bg-slate-50/80">
+                    <td className="py-3 text-sm text-slate-900">{item.producto}</td>
+                    <td className="py-3 text-center text-sm font-medium text-slate-900">{item.stock}</td>
+                    <td className="py-3 text-center text-sm text-slate-600">{item.minimo}</td>
                     <td className="py-3">
                       <Badge variant="danger">Stock bajo</Badge>
                     </td>
@@ -338,7 +432,7 @@ export default function Dashboard() {
                 ))}
                 {!isLoading && data.stockBajo.length === 0 ? (
                   <tr>
-                    <td colSpan={4} className="py-8 text-center text-sm text-gray-500">
+                    <td colSpan={4} className="py-8 text-center text-sm text-slate-500">
                       No hay productos con stock bajo.
                     </td>
                   </tr>

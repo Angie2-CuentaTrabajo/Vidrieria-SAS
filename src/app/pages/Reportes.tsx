@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
-import { TrendingUp, TrendingDown, Briefcase, DollarSign, Download, FileText, RotateCcw } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
+import { TrendingUp, TrendingDown, Briefcase, DollarSign, Download, FileText, RotateCcw, Sparkles } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Select } from '../components/ui/select';
 import { Input } from '../components/ui/input';
@@ -93,6 +93,21 @@ export default function Reportes() {
     }));
   }, [data.trabajosPorEstado]);
 
+  const periodLabel = useMemo(() => {
+    if (periodo === 'personalizado') {
+      return `Desde ${desde || '-'} hasta ${hasta || '-'}`;
+    }
+
+    const labels: Record<string, string> = {
+      dia: 'Hoy',
+      semana: 'Esta semana',
+      mes: 'Este mes',
+      anio: 'Este ano',
+    };
+
+    return labels[periodo] || 'Periodo actual';
+  }, [periodo, desde, hasta]);
+
   function handleClearFilters() {
     setPeriodo('mes');
     setDesde('');
@@ -114,10 +129,6 @@ export default function Reportes() {
   }
 
   function handleExportPdf() {
-    const periodLabel = periodo === 'personalizado'
-      ? `Desde ${desde || '-'} hasta ${hasta || '-'}`
-      : periodo;
-
     const html = `
       <h1>Reporte de Vidrieria</h1>
       <p class="muted">Periodo: ${periodLabel}</p>
@@ -155,149 +166,194 @@ export default function Reportes() {
   }
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Reportes</h1>
-          <p className="text-sm text-gray-600 mt-1">Analisis y estadisticas del negocio</p>
+    <div className="space-y-6 p-6">
+      <section className="overflow-hidden rounded-3xl border border-slate-200 bg-gradient-to-r from-white via-slate-50 to-sky-50 shadow-sm">
+        <div className="grid gap-6 px-6 py-6 lg:grid-cols-[1.2fr_0.8fr] lg:px-8">
+          <div className="space-y-4">
+            <div className="inline-flex items-center gap-2 rounded-full border border-sky-200 bg-sky-100/70 px-3 py-1 text-xs font-medium uppercase tracking-[0.18em] text-sky-800">
+              <Sparkles className="h-3.5 w-3.5" />
+              Centro de analisis
+            </div>
+            <div>
+              <h1 className="text-3xl font-semibold tracking-tight text-slate-900">Reportes del negocio</h1>
+              <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
+                Consulta ingresos, gastos y productividad por rango de fechas para presentar resultados o tomar decisiones operativas.
+              </p>
+            </div>
+          </div>
+
+          <div className="rounded-2xl border border-slate-200 bg-white/90 p-4 shadow-sm backdrop-blur">
+            <p className="text-xs font-medium uppercase tracking-[0.18em] text-slate-500">Periodo activo</p>
+            <p className="mt-2 text-lg font-semibold text-slate-900">{periodLabel}</p>
+            <p className="mt-1 text-sm text-slate-600">Puedes exportar este mismo corte en Excel o PDF.</p>
+          </div>
         </div>
-        <div className="flex gap-2">
-          <Select
-            value={periodo}
-            onChange={(event) => setPeriodo(event.target.value)}
-            options={[
-              { value: 'dia', label: 'Hoy' },
-              { value: 'semana', label: 'Esta semana' },
-              { value: 'mes', label: 'Este mes' },
-              { value: 'anio', label: 'Este ano' },
-              { value: 'personalizado', label: 'Rango personalizado' },
-            ]}
-          />
-          {periodo === 'personalizado' ? (
-            <>
-              <Input type="date" value={desde} onChange={(event) => setDesde(event.target.value)} />
-              <Input type="date" value={hasta} onChange={(event) => setHasta(event.target.value)} />
-            </>
-          ) : null}
-          <Button variant="outline" onClick={handleClearFilters}>
-            <RotateCcw className="w-4 h-4" />
-            Limpiar
-          </Button>
-          <Button variant="outline" onClick={handleExportExcel}>
-            <Download className="w-4 h-4" />
-            Excel
-          </Button>
-          <Button variant="outline" onClick={handleExportPdf}>
-            <FileText className="w-4 h-4" />
-            PDF
-          </Button>
-        </div>
+      </section>
+
+      <Card className="border-slate-200/80 shadow-sm">
+        <CardHeader className="gap-4 border-b border-slate-100 pb-4 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <CardTitle>Filtros y exportacion</CardTitle>
+            <CardDescription>Ajusta el rango y genera una salida lista para revisar o compartir.</CardDescription>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Select
+              value={periodo}
+              onChange={(event) => setPeriodo(event.target.value)}
+              options={[
+                { value: 'dia', label: 'Hoy' },
+                { value: 'semana', label: 'Esta semana' },
+                { value: 'mes', label: 'Este mes' },
+                { value: 'anio', label: 'Este ano' },
+                { value: 'personalizado', label: 'Rango personalizado' },
+              ]}
+            />
+            {periodo === 'personalizado' ? (
+              <>
+                <Input type="date" value={desde} onChange={(event) => setDesde(event.target.value)} />
+                <Input type="date" value={hasta} onChange={(event) => setHasta(event.target.value)} />
+              </>
+            ) : null}
+            <Button variant="outline" onClick={handleClearFilters}>
+              <RotateCcw className="w-4 h-4" />
+              Limpiar
+            </Button>
+            <Button variant="outline" onClick={handleExportExcel}>
+              <Download className="w-4 h-4" />
+              Excel
+            </Button>
+            <Button variant="outline" onClick={handleExportPdf}>
+              <FileText className="w-4 h-4" />
+              PDF
+            </Button>
+          </div>
+        </CardHeader>
+      </Card>
+
+      <div>
+        <h2 className="text-xl font-semibold text-slate-900">Resumen ejecutivo</h2>
+        <p className="mt-1 text-sm text-slate-600">Lectura rapida del rendimiento financiero y operativo en el periodo elegido.</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <Card className="overflow-hidden border-emerald-200 bg-gradient-to-br from-white to-emerald-50 shadow-sm">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Total ingresos</p>
-                <p className="text-2xl font-bold text-green-600 mt-1">
+                <p className="text-sm text-slate-600">Total ingresos</p>
+                <p className="mt-1 text-2xl font-bold text-emerald-700">
                   {formatCurrency(data.totalIngresos)}
                 </p>
               </div>
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                <TrendingUp className="w-6 h-6 text-green-600" />
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-100 ring-1 ring-emerald-200">
+                <TrendingUp className="w-6 h-6 text-emerald-600" />
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="overflow-hidden border-rose-200 bg-gradient-to-br from-white to-rose-50 shadow-sm">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Total gastos</p>
-                <p className="text-2xl font-bold text-red-600 mt-1">
+                <p className="text-sm text-slate-600">Total gastos</p>
+                <p className="mt-1 text-2xl font-bold text-rose-700">
                   {formatCurrency(data.totalGastos)}
                 </p>
               </div>
-              <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
-                <TrendingDown className="w-6 h-6 text-red-600" />
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-rose-100 ring-1 ring-rose-200">
+                <TrendingDown className="w-6 h-6 text-rose-600" />
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="overflow-hidden border-sky-200 bg-gradient-to-br from-white to-sky-50 shadow-sm">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Trabajos realizados</p>
-                <p className="text-2xl font-bold text-blue-600 mt-1">{data.trabajosRealizados}</p>
+                <p className="text-sm text-slate-600">Trabajos realizados</p>
+                <p className="mt-1 text-2xl font-bold text-sky-700">{data.trabajosRealizados}</p>
               </div>
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                <Briefcase className="w-6 h-6 text-blue-600" />
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-sky-100 ring-1 ring-sky-200">
+                <Briefcase className="w-6 h-6 text-sky-600" />
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="overflow-hidden border-violet-200 bg-gradient-to-br from-white to-violet-50 shadow-sm">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Utilidad neta</p>
-                <p className="text-2xl font-bold text-blue-600 mt-1">
+                <p className="text-sm text-slate-600">Utilidad neta</p>
+                <p className="mt-1 text-2xl font-bold text-violet-700">
                   {formatCurrency(data.utilidadNeta)}
                 </p>
               </div>
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                <DollarSign className="w-6 h-6 text-blue-600" />
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-violet-100 ring-1 ring-violet-200">
+                <DollarSign className="w-6 h-6 text-violet-600" />
               </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1.35fr_1fr]">
+        <Card className="border-slate-200/80 shadow-sm">
+          <CardHeader className="border-b border-slate-100 pb-4">
+            <CardTitle>Tendencia del periodo</CardTitle>
+            <CardDescription>Comparativo visual de ingresos y gastos dentro del rango seleccionado.</CardDescription>
+          </CardHeader>
+          <CardContent className="pt-6">
+            <ResponsiveContainer width="100%" height={340}>
+              <LineChart data={data.ingresosVsGastos}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
+                <XAxis dataKey="label" tickLine={false} axisLine={false} />
+                <YAxis tickLine={false} axisLine={false} />
+                <Tooltip formatter={(value) => formatCurrency(Number(value))} />
+                <Legend />
+                <Line type="monotone" dataKey="ingresos" stroke="#10b981" strokeWidth={3} dot={{ r: 3 }} name="Ingresos" />
+                <Line type="monotone" dataKey="gastos" stroke="#ef4444" strokeWidth={3} dot={{ r: 3 }} name="Gastos" />
+              </LineChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+
+        <Card className="border-slate-200/80 shadow-sm">
+          <CardHeader className="border-b border-slate-100 pb-4">
+            <CardTitle>Lectura rapida</CardTitle>
+            <CardDescription>Indicadores utiles para explicar el rendimiento en una reunion.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4 pt-6">
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+              <p className="text-xs font-medium uppercase tracking-[0.18em] text-slate-500">Margen estimado</p>
+              <p className="mt-2 text-2xl font-semibold text-slate-900">
+                {data.totalIngresos > 0 ? `${((data.utilidadNeta / data.totalIngresos) * 100).toFixed(1)}%` : '0.0%'}
+              </p>
+              <p className="mt-1 text-sm text-slate-600">Relacion entre utilidad neta e ingresos del periodo.</p>
+            </div>
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+              <p className="text-xs font-medium uppercase tracking-[0.18em] text-slate-500">Clientes con saldo</p>
+              <p className="mt-2 text-2xl font-semibold text-slate-900">{data.clientesConSaldo.length}</p>
+              <p className="mt-1 text-sm text-slate-600">Clientes que todavia mantienen deuda pendiente.</p>
+            </div>
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+              <p className="text-xs font-medium uppercase tracking-[0.18em] text-slate-500">Producto mas usado</p>
+              <p className="mt-2 text-lg font-semibold text-slate-900">{data.productosUsados[0]?.producto || 'Sin registros'}</p>
+              <p className="mt-1 text-sm text-slate-600">Ayuda a identificar materiales de mayor rotacion.</p>
             </div>
           </CardContent>
         </Card>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Ingresos en el periodo</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={data.ingresosVsGastos}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="label" />
-                <YAxis />
-                <Tooltip formatter={(value) => formatCurrency(Number(value))} />
-                <Line type="monotone" dataKey="ingresos" stroke="#10b981" strokeWidth={2} name="Ingresos" />
-              </LineChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Gastos en el periodo</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={data.ingresosVsGastos}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="label" />
-                <YAxis />
-                <Tooltip formatter={(value) => formatCurrency(Number(value))} />
-                <Bar dataKey="gastos" fill="#ef4444" name="Gastos" />
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
+        <Card className="border-slate-200/80 shadow-sm">
+          <CardHeader className="border-b border-slate-100 pb-4">
             <CardTitle>Trabajos por estado</CardTitle>
+            <CardDescription>Distribucion actual del flujo operativo.</CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-6">
             <ResponsiveContainer width="100%" height={300}>
               <PieChart>
                 <Pie
@@ -320,18 +376,19 @@ export default function Reportes() {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
+        <Card className="border-slate-200/80 shadow-sm">
+          <CardHeader className="border-b border-slate-100 pb-4">
             <CardTitle>Productos mas utilizados</CardTitle>
+            <CardDescription>Materiales con mayor salida dentro del periodo.</CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-6">
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={data.productosUsados} layout="vertical">
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis type="number" />
-                <YAxis dataKey="producto" type="category" width={150} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" horizontal={false} />
+                <XAxis type="number" tickLine={false} axisLine={false} />
+                <YAxis dataKey="producto" type="category" width={150} tickLine={false} axisLine={false} />
                 <Tooltip />
-                <Bar dataKey="cantidad" fill="#3b82f6" name="Cantidad" />
+                <Bar dataKey="cantidad" fill="#3b82f6" name="Cantidad" radius={[0, 8, 8, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
@@ -339,31 +396,32 @@ export default function Reportes() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
+        <Card className="border-slate-200/80 shadow-sm">
+          <CardHeader className="border-b border-slate-100 pb-4">
             <CardTitle>Clientes con saldo pendiente</CardTitle>
+            <CardDescription>Ayuda a priorizar seguimiento de cobros.</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-gray-50 border-b border-gray-200">
+                <thead className="border-b border-slate-200 bg-slate-50">
                   <tr>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Cliente</th>
-                    <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Saldo</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-slate-500">Cliente</th>
+                    <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wide text-slate-500">Saldo</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-200">
+                <tbody className="divide-y divide-slate-200">
                   {data.clientesConSaldo.map((cliente) => (
-                    <tr key={cliente.cliente} className="hover:bg-gray-50">
-                      <td className="px-4 py-3 text-sm text-gray-900">{cliente.cliente}</td>
-                      <td className="px-4 py-3 text-sm text-red-600 text-right font-medium">
+                    <tr key={cliente.cliente} className="hover:bg-slate-50/80">
+                      <td className="px-4 py-3 text-sm text-slate-900">{cliente.cliente}</td>
+                      <td className="px-4 py-3 text-right text-sm font-medium text-rose-600">
                         {formatCurrency(cliente.saldo)}
                       </td>
                     </tr>
                   ))}
                   {!isLoading && data.clientesConSaldo.length === 0 ? (
                     <tr>
-                      <td colSpan={2} className="px-4 py-10 text-center text-sm text-gray-500">
+                      <td colSpan={2} className="px-4 py-10 text-center text-sm text-slate-500">
                         No hay saldos pendientes en este periodo.
                       </td>
                     </tr>
@@ -374,27 +432,28 @@ export default function Reportes() {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
+        <Card className="border-slate-200/80 shadow-sm">
+          <CardHeader className="border-b border-slate-100 pb-4">
             <CardTitle>Resumen de trabajos</CardTitle>
+            <CardDescription>Lectura compacta del estado actual de ejecucion.</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               {trabajosPorEstado.map((item) => (
-                <div key={item.estado} className="flex items-center justify-between">
+                <div key={item.estado} className="flex items-center justify-between rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
                   <div className="flex items-center gap-3">
                     <div className="w-4 h-4 rounded-full" style={{ backgroundColor: item.color }} />
-                    <span className="text-sm text-gray-700">{item.label}</span>
+                    <span className="text-sm text-slate-700">{item.label}</span>
                   </div>
-                  <span className="text-sm font-medium text-gray-900">{item.cantidad}</span>
+                  <span className="text-sm font-semibold text-slate-900">{item.cantidad}</span>
                 </div>
               ))}
-              <div className="border-t border-gray-200 pt-4 flex items-center justify-between">
-                <span className="text-sm font-semibold text-gray-900">Total</span>
-                <span className="text-sm font-bold text-gray-900">{data.trabajosRealizados}</span>
+              <div className="flex items-center justify-between border-t border-slate-200 pt-4">
+                <span className="text-sm font-semibold text-slate-900">Total</span>
+                <span className="text-sm font-bold text-slate-900">{data.trabajosRealizados}</span>
               </div>
               {!isLoading && trabajosPorEstado.length === 0 ? (
-                <p className="text-sm text-gray-500">No hay trabajos registrados en este periodo.</p>
+                <p className="text-sm text-slate-500">No hay trabajos registrados en este periodo.</p>
               ) : null}
             </div>
           </CardContent>
