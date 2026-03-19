@@ -13,7 +13,7 @@ import { Link } from 'react-router';
 import { toast } from 'sonner';
 import { getClientes, type Cliente } from '../lib/clientes-api';
 import { createTrabajo, getTrabajos, updateTrabajo, type Trabajo, type TrabajoPayload } from '../lib/trabajos-api';
-import { exportRowsToCsv } from '../lib/export';
+import { exportRowsToExcel } from '../lib/export';
 
 function getEstadoBadge(estado: string) {
   const estados: Record<string, { label: string; variant: 'success' | 'warning' | 'info' | 'danger' | 'default' }> = {
@@ -178,8 +178,9 @@ export default function Trabajos() {
   }
 
   function handleExportExcel() {
-    exportRowsToCsv(
-      'trabajos-filtrados.csv',
+    exportRowsToExcel(
+      'trabajos-filtrados',
+      'Trabajos',
       ['Fecha', 'Cliente', 'Descripcion', 'Total', 'Adelanto', 'Saldo', 'Estado', 'Boleta', 'Fecha entrega'],
       filteredTrabajos.map((trabajo) => [
         formatDate(trabajo.fecha),
@@ -193,7 +194,7 @@ export default function Trabajos() {
         trabajo.fechaEntrega ? formatDate(trabajo.fechaEntrega) : '',
       ]),
     );
-    toast.success('Trabajos exportados correctamente.');
+    toast.success('Trabajos exportados en Excel.');
   }
 
   return (
@@ -325,26 +326,29 @@ export default function Trabajos() {
           <div className="py-6 text-sm text-gray-600">Necesitas registrar al menos un cliente antes de crear un trabajo.</div>
         ) : (
           <form onSubmit={handleSaveTrabajo} className="space-y-4">
+            <div className="rounded-2xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm text-blue-900">
+              Llena primero los datos basicos del pedido. Si el cliente dejo adelanto, registralo aqui para que el saldo se calcule solo.
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Select label="Cliente" value={form.clienteId} onChange={(event) => updateForm('clienteId', event.target.value)} options={[{ value: '', label: 'Seleccionar cliente' }, ...clientes.map((cliente) => ({ value: cliente.id, label: cliente.nombre }))]} required />
-              <Input label="Tipo de trabajo" value={form.tipoTrabajo} onChange={(event) => updateForm('tipoTrabajo', event.target.value)} placeholder="Ej: Mampara, puerta, espejo" />
+              <Select label="Cliente" helperText="Selecciona a la persona o empresa que solicito el trabajo." value={form.clienteId} onChange={(event) => updateForm('clienteId', event.target.value)} options={[{ value: '', label: 'Seleccionar cliente' }, ...clientes.map((cliente) => ({ value: cliente.id, label: cliente.nombre }))]} required />
+              <Input label="Tipo de trabajo" helperText="Escribe una categoria corta para ubicarlo rapido despues." value={form.tipoTrabajo} onChange={(event) => updateForm('tipoTrabajo', event.target.value)} placeholder="Ej: Mampara, puerta, espejo" />
             </div>
 
-            <Textarea label="Descripcion" value={form.descripcion} onChange={(event) => updateForm('descripcion', event.target.value)} rows={3} required />
+            <Textarea label="Descripcion" helperText="Describe lo que se va a fabricar o instalar para evitar confusiones." value={form.descripcion} onChange={(event) => updateForm('descripcion', event.target.value)} rows={3} required />
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Input label="Total" type="number" step="0.01" value={form.total} onChange={(event) => updateForm('total', event.target.value)} placeholder="0.00" required />
-              <Input label="Adelanto inicial" type="number" step="0.01" value={form.adelantoInicial} onChange={(event) => updateForm('adelantoInicial', event.target.value)} placeholder="0.00" disabled={Boolean(editingTrabajo)} />
-              <Select label="Metodo de pago" value={form.metodoPago} onChange={(event) => updateForm('metodoPago', event.target.value)} options={[{ value: 'EFECTIVO', label: 'Efectivo' }, { value: 'TRANSFERENCIA', label: 'Transferencia' }, { value: 'TARJETA', label: 'Tarjeta' }, { value: 'YAPE', label: 'Yape' }, { value: 'PLIN', label: 'Plin' }]} disabled={Boolean(editingTrabajo)} />
+              <Input label="Total" helperText="Monto total acordado con el cliente." type="number" step="0.01" value={form.total} onChange={(event) => updateForm('total', event.target.value)} placeholder="0.00" required />
+              <Input label="Adelanto inicial" helperText="Si el cliente pago algo al inicio, registralo aqui." type="number" step="0.01" value={form.adelantoInicial} onChange={(event) => updateForm('adelantoInicial', event.target.value)} placeholder="0.00" disabled={Boolean(editingTrabajo)} />
+              <Select label="Metodo de pago" helperText="Solo aplica para el adelanto inicial." value={form.metodoPago} onChange={(event) => updateForm('metodoPago', event.target.value)} options={[{ value: 'EFECTIVO', label: 'Efectivo' }, { value: 'TRANSFERENCIA', label: 'Transferencia' }, { value: 'TARJETA', label: 'Tarjeta' }, { value: 'YAPE', label: 'Yape' }, { value: 'PLIN', label: 'Plin' }]} disabled={Boolean(editingTrabajo)} />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Input label="Fecha de entrega" type="date" value={form.fechaEntrega} onChange={(event) => updateForm('fechaEntrega', event.target.value)} />
-              <Input label="Boleta o comprobante" value={form.comprobanteNumero} onChange={(event) => updateForm('comprobanteNumero', event.target.value)} placeholder="Ej: B001-000123" />
+              <Input label="Fecha de entrega" helperText="Sirve para verlo luego en calendario y seguimiento." type="date" value={form.fechaEntrega} onChange={(event) => updateForm('fechaEntrega', event.target.value)} />
+              <Input label="Boleta o comprobante" helperText="Opcional, pero util si ya se emitio un documento." value={form.comprobanteNumero} onChange={(event) => updateForm('comprobanteNumero', event.target.value)} placeholder="Ej: B001-000123" />
             </div>
 
-            <Input label="Direccion de instalacion" value={form.direccionInstalacion} onChange={(event) => updateForm('direccionInstalacion', event.target.value)} placeholder="Opcional" />
-            <Textarea label="Observaciones" value={form.observaciones} onChange={(event) => updateForm('observaciones', event.target.value)} rows={3} placeholder="Notas internas o detalles del pedido" />
+            <Input label="Direccion de instalacion" helperText="Si el trabajo se instala en obra, deja la direccion aqui." value={form.direccionInstalacion} onChange={(event) => updateForm('direccionInstalacion', event.target.value)} placeholder="Opcional" />
+            <Textarea label="Observaciones" helperText="Anota color, medidas pendientes, coordinaciones o notas internas." value={form.observaciones} onChange={(event) => updateForm('observaciones', event.target.value)} rows={3} placeholder="Notas internas o detalles del pedido" />
 
             <div className="flex gap-3 pt-4">
               <Button type="button" variant="outline" onClick={handleCloseModal} className="flex-1">Cancelar</Button>

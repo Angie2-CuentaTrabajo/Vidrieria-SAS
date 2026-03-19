@@ -327,16 +327,19 @@ export default function Inventario() {
 
       <Modal isOpen={isModalProductoOpen} onClose={handleCloseProductoModal} title={editingProducto ? 'Editar Producto' : 'Nuevo Producto'} size="md">
         <form onSubmit={handleSaveProducto} className="space-y-4">
-          <Input label="Nombre del producto" value={productoForm.nombre} onChange={(event) => setProductoForm({ ...productoForm, nombre: event.target.value })} placeholder="Ej: Vidrio templado 6mm" required />
-          <Select label="Categoria" value={productoForm.categoria} onChange={(event) => setProductoForm({ ...productoForm, categoria: event.target.value })} options={[{ value: '', label: 'Seleccionar categoria' }, { value: 'Vidrios', label: 'Vidrios' }, { value: 'Espejos', label: 'Espejos' }, { value: 'Perfiles', label: 'Perfiles' }, { value: 'Accesorios', label: 'Accesorios' }]} required />
-          <Select label="Unidad" value={productoForm.unidad} onChange={(event) => setProductoForm({ ...productoForm, unidad: event.target.value })} options={[{ value: 'm2', label: 'm2' }, { value: 'm', label: 'm' }, { value: 'unid', label: 'Unidad' }]} required />
-          <div className="grid grid-cols-2 gap-4">
-            <Input label="Stock inicial" type="number" value={productoForm.stockInicial} onChange={(event) => setProductoForm({ ...productoForm, stockInicial: event.target.value })} placeholder="0" required={!editingProducto} disabled={Boolean(editingProducto)} />
-            <Input label="Stock minimo" type="number" value={productoForm.stockMinimo} onChange={(event) => setProductoForm({ ...productoForm, stockMinimo: event.target.value })} placeholder="0" required />
+          <div className="rounded-2xl border border-indigo-100 bg-indigo-50 px-4 py-3 text-sm text-indigo-900">
+            Crea cada material una sola vez. Luego las entradas y salidas te ayudaran a mantener el stock correcto.
           </div>
-          <Input label="Costo unitario" type="number" step="0.01" value={productoForm.costoUnitario} onChange={(event) => setProductoForm({ ...productoForm, costoUnitario: event.target.value })} placeholder="0.00" required />
-          <Input label="Proveedor" value={productoForm.proveedor} onChange={(event) => setProductoForm({ ...productoForm, proveedor: event.target.value })} placeholder="Nombre del proveedor" />
-          <Textarea label="Observacion" value={productoForm.observacion} onChange={(event) => setProductoForm({ ...productoForm, observacion: event.target.value })} rows={3} />
+          <Input label="Nombre del producto" helperText="Usa el nombre con el que lo reconocen en el taller o almacen." value={productoForm.nombre} onChange={(event) => setProductoForm({ ...productoForm, nombre: event.target.value })} placeholder="Ej: Vidrio templado 6mm" required />
+          <Select label="Categoria" helperText="Agrupa productos similares para buscarlos mas facil." value={productoForm.categoria} onChange={(event) => setProductoForm({ ...productoForm, categoria: event.target.value })} options={[{ value: '', label: 'Seleccionar categoria' }, { value: 'Vidrios', label: 'Vidrios' }, { value: 'Espejos', label: 'Espejos' }, { value: 'Perfiles', label: 'Perfiles' }, { value: 'Accesorios', label: 'Accesorios' }]} required />
+          <Select label="Unidad" helperText="Define si el producto se controla por m2, metros o unidades." value={productoForm.unidad} onChange={(event) => setProductoForm({ ...productoForm, unidad: event.target.value })} options={[{ value: 'm2', label: 'm2' }, { value: 'm', label: 'm' }, { value: 'unid', label: 'Unidad' }]} required />
+          <div className="grid grid-cols-2 gap-4">
+            <Input label="Stock inicial" helperText="Solo se usa al crear el producto por primera vez." type="number" value={productoForm.stockInicial} onChange={(event) => setProductoForm({ ...productoForm, stockInicial: event.target.value })} placeholder="0" required={!editingProducto} disabled={Boolean(editingProducto)} />
+            <Input label="Stock minimo" helperText="Cuando baje de este numero, el sistema lo marcara como stock bajo." type="number" value={productoForm.stockMinimo} onChange={(event) => setProductoForm({ ...productoForm, stockMinimo: event.target.value })} placeholder="0" required />
+          </div>
+          <Input label="Costo unitario" helperText="Costo aproximado de compra por unidad de medida." type="number" step="0.01" value={productoForm.costoUnitario} onChange={(event) => setProductoForm({ ...productoForm, costoUnitario: event.target.value })} placeholder="0.00" required />
+          <Input label="Proveedor" helperText="Opcional, pero util para recordar donde se compra normalmente." value={productoForm.proveedor} onChange={(event) => setProductoForm({ ...productoForm, proveedor: event.target.value })} placeholder="Nombre del proveedor" />
+          <Textarea label="Observacion" helperText="Puedes anotar color, grosor, marca o cualquier detalle util." value={productoForm.observacion} onChange={(event) => setProductoForm({ ...productoForm, observacion: event.target.value })} rows={3} />
 
           <div className="flex gap-3 pt-4">
             <Button type="button" variant="outline" onClick={handleCloseProductoModal} className="flex-1">Cancelar</Button>
@@ -347,13 +350,16 @@ export default function Inventario() {
 
       <Modal isOpen={isModalEntradaOpen} onClose={() => setIsModalEntradaOpen(false)} title="Entrada de Inventario" size="md">
         <form onSubmit={(event) => { event.preventDefault(); handleMovimiento('ENTRADA', entradaForm); }} className="space-y-4">
-          <Select label="Producto" value={entradaForm.productoId} onChange={(event) => setEntradaForm({ ...entradaForm, productoId: event.target.value })} options={[{ value: '', label: 'Seleccionar producto' }, ...productos.map((producto) => ({ value: producto.id, label: producto.nombre }))]} required />
-          <Input label="Cantidad" type="number" value={entradaForm.cantidad} onChange={(event) => setEntradaForm({ ...entradaForm, cantidad: event.target.value })} placeholder="0" required />
-          <Input label="Costo unitario" type="number" step="0.01" value={entradaForm.costoUnitario} onChange={(event) => setEntradaForm({ ...entradaForm, costoUnitario: event.target.value })} placeholder="0.00" />
-          <Input label="Proveedor" value={entradaForm.proveedor} onChange={(event) => setEntradaForm({ ...entradaForm, proveedor: event.target.value })} placeholder="Nombre del proveedor" />
-          <Input label="Referencia" value={entradaForm.referencia} onChange={(event) => setEntradaForm({ ...entradaForm, referencia: event.target.value })} placeholder="Factura, guia u otra referencia" />
-          <Input label="Fecha" type="date" value={entradaForm.fecha} onChange={(event) => setEntradaForm({ ...entradaForm, fecha: event.target.value })} required />
-          <Textarea label="Observacion" value={entradaForm.observacion} onChange={(event) => setEntradaForm({ ...entradaForm, observacion: event.target.value })} rows={3} />
+          <div className="rounded-2xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-sm text-emerald-900">
+            Usa entrada cuando compraste material nuevo o cuando necesitas aumentar stock por correccion.
+          </div>
+          <Select label="Producto" helperText="Selecciona el material que ingreso al almacen." value={entradaForm.productoId} onChange={(event) => setEntradaForm({ ...entradaForm, productoId: event.target.value })} options={[{ value: '', label: 'Seleccionar producto' }, ...productos.map((producto) => ({ value: producto.id, label: producto.nombre }))]} required />
+          <Input label="Cantidad" helperText="Cantidad que ingreso hoy." type="number" value={entradaForm.cantidad} onChange={(event) => setEntradaForm({ ...entradaForm, cantidad: event.target.value })} placeholder="0" required />
+          <Input label="Costo unitario" helperText="Opcional, pero sirve para calcular mejor el valor del inventario." type="number" step="0.01" value={entradaForm.costoUnitario} onChange={(event) => setEntradaForm({ ...entradaForm, costoUnitario: event.target.value })} placeholder="0.00" />
+          <Input label="Proveedor" helperText="Quien entrego el material o a quien se le compro." value={entradaForm.proveedor} onChange={(event) => setEntradaForm({ ...entradaForm, proveedor: event.target.value })} placeholder="Nombre del proveedor" />
+          <Input label="Referencia" helperText="Factura, guia o cualquier codigo que ayude a rastrear la compra." value={entradaForm.referencia} onChange={(event) => setEntradaForm({ ...entradaForm, referencia: event.target.value })} placeholder="Factura, guia u otra referencia" />
+          <Input label="Fecha" helperText="Fecha real de ingreso." type="date" value={entradaForm.fecha} onChange={(event) => setEntradaForm({ ...entradaForm, fecha: event.target.value })} required />
+          <Textarea label="Observacion" helperText="Anota detalles utiles como lote, color o estado del material." value={entradaForm.observacion} onChange={(event) => setEntradaForm({ ...entradaForm, observacion: event.target.value })} rows={3} />
 
           <div className="flex gap-3 pt-4">
             <Button type="button" variant="outline" onClick={() => setIsModalEntradaOpen(false)} className="flex-1">Cancelar</Button>
@@ -364,12 +370,15 @@ export default function Inventario() {
 
       <Modal isOpen={isModalSalidaOpen} onClose={() => setIsModalSalidaOpen(false)} title="Salida de Inventario" size="md">
         <form onSubmit={(event) => { event.preventDefault(); handleMovimiento('SALIDA', salidaForm); }} className="space-y-4">
-          <Select label="Producto" value={salidaForm.productoId} onChange={(event) => setSalidaForm({ ...salidaForm, productoId: event.target.value })} options={[{ value: '', label: 'Seleccionar producto' }, ...productos.map((producto) => ({ value: producto.id, label: producto.nombre }))]} required />
-          <Input label="Cantidad" type="number" value={salidaForm.cantidad} onChange={(event) => setSalidaForm({ ...salidaForm, cantidad: event.target.value })} placeholder="0" required />
-          <Select label="Motivo" value={salidaForm.motivo} onChange={(event) => setSalidaForm({ ...salidaForm, motivo: event.target.value })} options={[{ value: 'USO_EN_TRABAJO', label: 'Uso en trabajo' }, { value: 'VENTA_DIRECTA', label: 'Venta directa' }, { value: 'MERMA', label: 'Merma o rotura' }, { value: 'AJUSTE', label: 'Ajuste' }, { value: 'OTRO', label: 'Otro' }]} required />
-          <Input label="Referencia" value={salidaForm.referencia} onChange={(event) => setSalidaForm({ ...salidaForm, referencia: event.target.value })} placeholder="Trabajo asociado, venta u observacion corta" />
-          <Input label="Fecha" type="date" value={salidaForm.fecha} onChange={(event) => setSalidaForm({ ...salidaForm, fecha: event.target.value })} required />
-          <Textarea label="Observacion" value={salidaForm.observacion} onChange={(event) => setSalidaForm({ ...salidaForm, observacion: event.target.value })} rows={3} />
+          <div className="rounded-2xl border border-amber-100 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+            Usa salida cuando el material se consumio en un trabajo, se vendio o se perdio por merma o rotura.
+          </div>
+          <Select label="Producto" helperText="Selecciona el material que salio del inventario." value={salidaForm.productoId} onChange={(event) => setSalidaForm({ ...salidaForm, productoId: event.target.value })} options={[{ value: '', label: 'Seleccionar producto' }, ...productos.map((producto) => ({ value: producto.id, label: producto.nombre }))]} required />
+          <Input label="Cantidad" helperText="Cantidad que ya no quedara disponible en stock." type="number" value={salidaForm.cantidad} onChange={(event) => setSalidaForm({ ...salidaForm, cantidad: event.target.value })} placeholder="0" required />
+          <Select label="Motivo" helperText="Aclara por que salio el material y mejora los reportes." value={salidaForm.motivo} onChange={(event) => setSalidaForm({ ...salidaForm, motivo: event.target.value })} options={[{ value: 'USO_EN_TRABAJO', label: 'Uso en trabajo' }, { value: 'VENTA_DIRECTA', label: 'Venta directa' }, { value: 'MERMA', label: 'Merma o rotura' }, { value: 'AJUSTE', label: 'Ajuste' }, { value: 'OTRO', label: 'Otro' }]} required />
+          <Input label="Referencia" helperText="Puedes poner numero de trabajo, venta o una nota corta." value={salidaForm.referencia} onChange={(event) => setSalidaForm({ ...salidaForm, referencia: event.target.value })} placeholder="Trabajo asociado, venta u observacion corta" />
+          <Input label="Fecha" helperText="Fecha real en que salio el material." type="date" value={salidaForm.fecha} onChange={(event) => setSalidaForm({ ...salidaForm, fecha: event.target.value })} required />
+          <Textarea label="Observacion" helperText="Usa este espacio si necesitas explicar mejor la salida." value={salidaForm.observacion} onChange={(event) => setSalidaForm({ ...salidaForm, observacion: event.target.value })} rows={3} />
 
           <div className="flex gap-3 pt-4">
             <Button type="button" variant="outline" onClick={() => setIsModalSalidaOpen(false)} className="flex-1">Cancelar</Button>

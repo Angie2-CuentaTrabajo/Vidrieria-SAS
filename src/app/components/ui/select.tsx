@@ -9,10 +9,11 @@ type SelectOption = {
 
 type SelectProps = React.ComponentProps<"select"> & {
   label?: string;
+  helperText?: string;
   options?: SelectOption[];
 };
 
-function Select({ className, label, id, options, children, ...props }: SelectProps) {
+function Select({ className, label, helperText, id, options, children, ...props }: SelectProps) {
   const select = (
     <select
       id={id}
@@ -41,6 +42,7 @@ function Select({ className, label, id, options, children, ...props }: SelectPro
     <label className="block space-y-1.5">
       <span className="block text-sm font-medium text-gray-700">{label}</span>
       {select}
+      {helperText ? <span className="block text-xs leading-5 text-gray-500">{helperText}</span> : null}
     </label>
   );
 }

@@ -10,7 +10,7 @@ import { Textarea } from '../components/ui/textarea';
 import { formatCurrency, formatDate } from '../lib/utils';
 import { createGasto, getGastos, updateGasto, type Gasto, type GastoPayload } from '../lib/gastos-api';
 import { toast } from 'sonner';
-import { exportRowsToCsv } from '../lib/export';
+import { exportRowsToExcel } from '../lib/export';
 
 const initialForm: GastoPayload = {
   fecha: new Date().toISOString().split('T')[0],
@@ -137,8 +137,9 @@ export default function Gastos() {
   }
 
   function handleExportExcel() {
-    exportRowsToCsv(
-      'gastos-filtrados.csv',
+    exportRowsToExcel(
+      'gastos-filtrados',
+      'Gastos',
       ['Fecha', 'Descripcion', 'Categoria', 'Monto', 'Referencia', 'Observacion'],
       filteredGastos.map((gasto) => [
         formatDate(gasto.fecha),
@@ -149,7 +150,7 @@ export default function Gastos() {
         gasto.observacion || '',
       ]),
     );
-    toast.success('Gastos exportados correctamente.');
+    toast.success('Gastos exportados en Excel.');
   }
 
   return (
@@ -245,12 +246,15 @@ export default function Gastos() {
 
       <Modal isOpen={isModalOpen} onClose={handleCloseModal} title={editingGasto ? 'Editar Gasto' : 'Nuevo Gasto'} size="md">
         <form onSubmit={handleSubmit} className="space-y-4">
-          <Input label="Fecha" type="date" value={form.fecha} onChange={(event) => updateForm('fecha', event.target.value)} required />
-          <Input label="Descripcion" placeholder="Ej: Compra de materiales" value={form.descripcion} onChange={(event) => updateForm('descripcion', event.target.value)} required />
-          <Select label="Categoria" value={form.categoria} onChange={(event) => updateForm('categoria', event.target.value)} options={[{ value: '', label: 'Seleccionar categoria' }, { value: 'Materiales', label: 'Materiales' }, { value: 'Transporte', label: 'Transporte' }, { value: 'Servicios', label: 'Servicios' }, { value: 'Herramientas', label: 'Herramientas' }, { value: 'Mantenimiento', label: 'Mantenimiento' }, { value: 'Otros', label: 'Otros' }]} required />
-          <Input label="Monto" type="number" step="0.01" placeholder="0.00" value={form.monto} onChange={(event) => updateForm('monto', event.target.value)} required />
-          <Input label="Referencia (opcional)" placeholder="Ej: Factura, recibo" value={form.referencia} onChange={(event) => updateForm('referencia', event.target.value)} />
-          <Textarea label="Observacion (opcional)" rows={3} value={form.observacion} onChange={(event) => updateForm('observacion', event.target.value)} />
+          <div className="rounded-2xl border border-rose-100 bg-rose-50 px-4 py-3 text-sm text-rose-900">
+            Registra aqui cualquier salida de dinero del negocio para que caja y reportes siempre queden correctos.
+          </div>
+          <Input label="Fecha" helperText="Dia en que realmente se hizo el gasto." type="date" value={form.fecha} onChange={(event) => updateForm('fecha', event.target.value)} required />
+          <Input label="Descripcion" helperText="Escribe que se compro o pago de forma clara." placeholder="Ej: Compra de materiales" value={form.descripcion} onChange={(event) => updateForm('descripcion', event.target.value)} required />
+          <Select label="Categoria" helperText="Ayuda a ordenar reportes como materiales, transporte o servicios." value={form.categoria} onChange={(event) => updateForm('categoria', event.target.value)} options={[{ value: '', label: 'Seleccionar categoria' }, { value: 'Materiales', label: 'Materiales' }, { value: 'Transporte', label: 'Transporte' }, { value: 'Servicios', label: 'Servicios' }, { value: 'Herramientas', label: 'Herramientas' }, { value: 'Mantenimiento', label: 'Mantenimiento' }, { value: 'Otros', label: 'Otros' }]} required />
+          <Input label="Monto" helperText="Coloca el importe total pagado." type="number" step="0.01" placeholder="0.00" value={form.monto} onChange={(event) => updateForm('monto', event.target.value)} required />
+          <Input label="Referencia (opcional)" helperText="Puedes guardar numero de recibo, factura o una nota corta." placeholder="Ej: Factura, recibo" value={form.referencia} onChange={(event) => updateForm('referencia', event.target.value)} />
+          <Textarea label="Observacion (opcional)" helperText="Usa este espacio para detalles extra que luego ayuden a recordar el gasto." rows={3} value={form.observacion} onChange={(event) => updateForm('observacion', event.target.value)} />
 
           <div className="flex gap-3 pt-4">
             <Button type="button" variant="outline" onClick={handleCloseModal} className="flex-1">Cancelar</Button>

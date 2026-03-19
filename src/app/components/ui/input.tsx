@@ -4,9 +4,10 @@ import { cn } from "./utils";
 
 type InputProps = React.ComponentProps<"input"> & {
   label?: string;
+  helperText?: string;
 };
 
-function Input({ className, label, id, ...props }: InputProps) {
+function Input({ className, label, helperText, id, ...props }: InputProps) {
   const input = (
     <input
       id={id}
@@ -27,6 +28,7 @@ function Input({ className, label, id, ...props }: InputProps) {
     <label className="block space-y-1.5">
       <span className="block text-sm font-medium text-gray-700">{label}</span>
       {input}
+      {helperText ? <span className="block text-xs leading-5 text-gray-500">{helperText}</span> : null}
     </label>
   );
 }

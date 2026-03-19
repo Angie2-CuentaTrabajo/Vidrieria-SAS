@@ -4,9 +4,10 @@ import { cn } from "./utils";
 
 type TextareaProps = React.ComponentProps<"textarea"> & {
   label?: string;
+  helperText?: string;
 };
 
-function Textarea({ className, label, id, ...props }: TextareaProps) {
+function Textarea({ className, label, helperText, id, ...props }: TextareaProps) {
   const textarea = (
     <textarea
       id={id}
@@ -27,6 +28,7 @@ function Textarea({ className, label, id, ...props }: TextareaProps) {
     <label className="block space-y-1.5">
       <span className="block text-sm font-medium text-gray-700">{label}</span>
       {textarea}
+      {helperText ? <span className="block text-xs leading-5 text-gray-500">{helperText}</span> : null}
     </label>
   );
 }

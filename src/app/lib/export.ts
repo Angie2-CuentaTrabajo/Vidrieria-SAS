@@ -1,8 +1,4 @@
-function escapeCsvValue(value: unknown) {
-  const normalized = value == null ? '' : String(value);
-  const escaped = normalized.replace(/"/g, '""');
-  return `"${escaped}"`;
-}
+import * as XLSX from 'xlsx';
 
 function downloadBlob(blob: Blob, filename: string) {
   const url = URL.createObjectURL(blob);
@@ -15,17 +11,52 @@ function downloadBlob(blob: Blob, filename: string) {
   URL.revokeObjectURL(url);
 }
 
-export function exportRowsToCsv(filename: string, headers: string[], rows: Array<Array<unknown>>) {
-  const csv = [
-    headers.map(escapeCsvValue).join(','),
-    ...rows.map((row) => row.map(escapeCsvValue).join(',')),
-  ].join('\n');
+function buildAutoWidths(rows: Array<Record<string, unknown>>) {
+  if (rows.length === 0) {
+    return [];
+  }
 
-  const blob = new Blob([`\uFEFF${csv}`], {
-    type: 'text/csv;charset=utf-8;',
+  const keys = Object.keys(rows[0]);
+
+  return keys.map((key) => {
+    const maxLength = rows.reduce((length, row) => {
+      const value = row[key];
+      return Math.max(length, String(value ?? '').length);
+    }, key.length);
+
+    return { wch: Math.min(Math.max(maxLength + 2, 12), 40) };
+  });
+}
+
+export function exportRowsToExcel(
+  filename: string,
+  sheetName: string,
+  headers: string[],
+  rows: Array<Array<unknown>>,
+) {
+  const normalizedRows = rows.map((row) =>
+    headers.reduce<Record<string, unknown>>((record, header, index) => {
+      record[header] = row[index] ?? '';
+      return record;
+    }, {}),
+  );
+
+  const worksheet = XLSX.utils.json_to_sheet(normalizedRows);
+  worksheet['!cols'] = buildAutoWidths(normalizedRows);
+
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
+
+  const excelBuffer = XLSX.write(workbook, {
+    bookType: 'xlsx',
+    type: 'array',
   });
 
-  downloadBlob(blob, filename);
+  const blob = new Blob([excelBuffer], {
+    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  });
+
+  downloadBlob(blob, filename.endsWith('.xlsx') ? filename : `${filename}.xlsx`);
 }
 
 export function printHtmlAsPdf(title: string, html: string) {

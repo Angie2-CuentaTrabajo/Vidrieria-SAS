@@ -10,7 +10,7 @@ import { formatCurrency, formatDate } from '../lib/utils';
 import { toast } from 'sonner';
 import { createPago, getPagos, type Pago } from '../lib/pagos-api';
 import { getTrabajos, type Trabajo } from '../lib/trabajos-api';
-import { exportRowsToCsv } from '../lib/export';
+import { exportRowsToExcel } from '../lib/export';
 
 function formatEnumLabel(value: string) {
   return value
@@ -113,8 +113,9 @@ export default function Pagos() {
   }
 
   function handleExportExcel() {
-    exportRowsToCsv(
-      'pagos-filtrados.csv',
+    exportRowsToExcel(
+      'pagos-filtrados',
+      'Pagos',
       ['Fecha', 'Cliente', 'Trabajo', 'Monto', 'Metodo', 'Tipo'],
       filteredPagos.map((pago) => [
         formatDate(pago.fecha),
@@ -125,7 +126,7 @@ export default function Pagos() {
         pago.tipo,
       ]),
     );
-    toast.success('Pagos exportados correctamente.');
+    toast.success('Pagos exportados en Excel.');
   }
 
   return (
@@ -234,10 +235,13 @@ export default function Pagos() {
 
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Registrar Pago" size="md">
         <form onSubmit={handleSubmit} className="space-y-4">
-          <Select label="Trabajo asociado" value={pagoData.trabajoId} onChange={(e) => setPagoData({ ...pagoData, trabajoId: e.target.value })} options={trabajoOptions} required />
-          <Input label="Monto" type="number" step="0.01" value={pagoData.monto} onChange={(e) => setPagoData({ ...pagoData, monto: e.target.value })} placeholder="0.00" required />
-          <Select label="Método de pago" value={pagoData.metodo} onChange={(e) => setPagoData({ ...pagoData, metodo: e.target.value })} options={[{ value: 'EFECTIVO', label: 'Efectivo' }, { value: 'TRANSFERENCIA', label: 'Transferencia' }, { value: 'TARJETA', label: 'Tarjeta' }, { value: 'YAPE', label: 'Yape' }, { value: 'PLIN', label: 'Plin' }]} />
-          <Select label="Tipo de pago" value={pagoData.tipo} onChange={(e) => setPagoData({ ...pagoData, tipo: e.target.value })} options={[{ value: 'ADELANTO', label: 'Adelanto' }, { value: 'PARCIAL', label: 'Parcial' }, { value: 'FINAL', label: 'Final' }]} />
+          <div className="rounded-2xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-sm text-emerald-900">
+            Registra el cobro usando el trabajo correcto para que el saldo del cliente y la caja se actualicen solos.
+          </div>
+          <Select label="Trabajo asociado" helperText="Elige el trabajo al que corresponde este pago." value={pagoData.trabajoId} onChange={(e) => setPagoData({ ...pagoData, trabajoId: e.target.value })} options={trabajoOptions} required />
+          <Input label="Monto" helperText="Escribe exactamente lo que el cliente pago hoy." type="number" step="0.01" value={pagoData.monto} onChange={(e) => setPagoData({ ...pagoData, monto: e.target.value })} placeholder="0.00" required />
+          <Select label="Método de pago" helperText="Sirve para diferenciar efectivo, transferencia, Yape u otros medios." value={pagoData.metodo} onChange={(e) => setPagoData({ ...pagoData, metodo: e.target.value })} options={[{ value: 'EFECTIVO', label: 'Efectivo' }, { value: 'TRANSFERENCIA', label: 'Transferencia' }, { value: 'TARJETA', label: 'Tarjeta' }, { value: 'YAPE', label: 'Yape' }, { value: 'PLIN', label: 'Plin' }]} />
+          <Select label="Tipo de pago" helperText="Usa adelanto si recien empieza, parcial si falta cobrar y final cuando ya se cancelo todo." value={pagoData.tipo} onChange={(e) => setPagoData({ ...pagoData, tipo: e.target.value })} options={[{ value: 'ADELANTO', label: 'Adelanto' }, { value: 'PARCIAL', label: 'Parcial' }, { value: 'FINAL', label: 'Final' }]} />
           <div className="flex gap-3 pt-4">
             <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)} className="flex-1">Cancelar</Button>
             <Button type="submit" className="flex-1" disabled={isSaving}>{isSaving ? 'Guardando...' : 'Registrar'}</Button>

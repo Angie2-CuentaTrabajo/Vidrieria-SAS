@@ -324,8 +324,12 @@ export default function Clientes() {
         size="md"
       >
         <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="rounded-2xl border border-sky-100 bg-sky-50 px-4 py-3 text-sm text-sky-900">
+            Registra aqui los datos base del cliente para poder crear trabajos, pagos y seguimiento sin repetir informacion despues.
+          </div>
           <Input
             label="Nombre completo"
+            helperText="Es el nombre con el que lo buscaran luego en trabajos y pagos."
             value={formData.nombre}
             onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
             placeholder="Ej: Juan Pérez García"
@@ -334,6 +338,7 @@ export default function Clientes() {
 
           <Input
             label="Teléfono"
+            helperText="Numero principal para llamadas, WhatsApp o coordinaciones."
             type="tel"
             value={formData.telefono}
             onChange={(e) => setFormData({ ...formData, telefono: e.target.value })}
@@ -343,6 +348,7 @@ export default function Clientes() {
 
           <Input
             label="Dirección"
+            helperText="Direccion del cliente o lugar frecuente de instalacion."
             value={formData.direccion}
             onChange={(e) => setFormData({ ...formData, direccion: e.target.value })}
             placeholder="Ej: Av. Principal 123, Lima"
@@ -351,6 +357,7 @@ export default function Clientes() {
 
           <Input
             label="Documento (opcional)"
+            helperText="Puede ser DNI o RUC si te sirve para comprobantes o control interno."
             value={formData.documento}
             onChange={(e) => setFormData({ ...formData, documento: e.target.value })}
             placeholder="Ej: DNI o RUC"
@@ -358,6 +365,7 @@ export default function Clientes() {
 
           <Textarea
             label="Observación (opcional)"
+            helperText="Anota datos utiles como referencia de ubicacion, horario o preferencia del cliente."
             value={formData.observacion}
             onChange={(e) => setFormData({ ...formData, observacion: e.target.value })}
             placeholder="Notas adicionales sobre el cliente"

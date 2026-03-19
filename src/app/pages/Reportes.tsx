@@ -7,7 +7,7 @@ import { Input } from '../components/ui/input';
 import { formatCurrency } from '../lib/utils';
 import { getReportes, type ReportesResumen } from '../lib/reportes-api';
 import { toast } from 'sonner';
-import { exportRowsToCsv, printHtmlAsPdf } from '../lib/export';
+import { exportRowsToExcel, printHtmlAsPdf } from '../lib/export';
 import {
   BarChart,
   Bar,
@@ -115,8 +115,9 @@ export default function Reportes() {
   }
 
   function handleExportExcel() {
-    exportRowsToCsv(
-      'reporte-resumen.csv',
+    exportRowsToExcel(
+      'reporte-resumen',
+      'Resumen',
       ['Concepto', 'Valor'],
       [
         ['Total ingresos', data.totalIngresos],
@@ -125,7 +126,7 @@ export default function Reportes() {
         ['Trabajos realizados', data.trabajosRealizados],
       ],
     );
-    toast.success('Resumen exportado a Excel.');
+    toast.success('Resumen exportado en Excel.');
   }
 
   function handleExportPdf() {
