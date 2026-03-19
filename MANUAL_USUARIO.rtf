@@ -1,0 +1,100 @@
+{\rtf1\ansi\deff0
+{\fonttbl{\f0 Arial;}}
+\fs24
+\b Manual de Usuario\b0\par
+Sistema de Gestion Vidrieria\par
+\par
+\b 1. Objetivo del sistema\b0\par
+Este sistema ayuda a registrar y controlar la operacion diaria de una vidrieria. Permite gestionar clientes, cotizaciones, trabajos, pagos, inventario, gastos, caja, reportes, calendario, usuarios y configuracion del negocio.\par
+\par
+\b 2. Ingreso al sistema\b0\par
+1. Abrir el sistema en el navegador.\par
+2. Ingresar con el correo y la contrasena asignados.\par
+3. Presionar Iniciar sesion.\par
+\par
+Usuario inicial de prueba:\par
+- Correo: admin@vidrieria.com\par
+- Contrasena: admin123\par
+\par
+\b 3. Flujo principal de trabajo\b0\par
+Cliente -> Cotizacion -> Trabajo -> Pago -> Caja -> Reportes\par
+\par
+\b 4. Modulos del sistema\b0\par
+\par
+\b Dashboard\b0\par
+Muestra un resumen general del negocio: ingresos y gastos, trabajos recientes, pagos recientes, alertas y stock bajo.\par
+\par
+\b Clientes\b0\par
+Sirve para registrar y administrar clientes. Permite crear clientes, editar clientes, ver el detalle de cada cliente y revisar trabajos y pagos asociados.\par
+\par
+\b Cotizaciones\b0\par
+Sirve para registrar presupuestos antes de crear un trabajo. Permite crear cotizaciones con items, mano de obra y descuento, editar cotizaciones no convertidas, aprobar o rechazar cotizaciones, convertir cotizaciones en trabajos, eliminar cotizaciones pendientes sin trabajo asociado y anular cotizaciones usadas o que deben conservar historial.\par
+\par
+Reglas importantes:\par
+- Una cotizacion pendiente y sin trabajo asociado se puede eliminar.\par
+- Una cotizacion usada o relacionada con un trabajo no debe borrarse.\par
+- En esos casos se debe anular para conservar historial.\par
+\par
+Estados usados: PENDIENTE, APROBADA, RECHAZADA, VENCIDA, ANULADA.\par
+\par
+\b Trabajos\b0\par
+Sirve para registrar trabajos reales del negocio. Permite crear trabajos, editar trabajos, cambiar estado, ver detalle del trabajo, consultar pagos del trabajo y revisar saldo pendiente.\par
+\par
+Estados usados: PENDIENTE, EN PROCESO, TERMINADO, ENTREGADO, CANCELADO.\par
+\par
+\b Pagos\b0\par
+Sirve para registrar el dinero recibido por trabajos. Permite registrar adelantos, pagos parciales y pagos finales. Cada pago impacta automaticamente en el saldo del trabajo y en caja.\par
+\par
+\b Inventario\b0\par
+Sirve para controlar productos y materiales. Permite crear productos, editar productos, registrar entradas, registrar salidas, revisar historial de movimientos y detectar stock bajo.\par
+\par
+\b Gastos\b0\par
+Sirve para registrar egresos del negocio. Permite crear gastos, editar gastos y clasificarlos por categoria. Cada gasto impacta automaticamente en caja.\par
+\par
+\b Caja\b0\par
+Muestra los movimientos de dinero del negocio. Permite revisar ingresos, salidas, saldo general y origen de cada movimiento.\par
+\par
+\b Reportes\b0\par
+Muestra informacion resumida para analisis. Incluye ingresos vs gastos, utilidad neta, trabajos realizados, trabajos por estado, clientes con saldo y productos mas usados.\par
+\par
+\b Calendario\b0\par
+Muestra los trabajos segun fecha de entrega. Sirve para planificar instalaciones, revisar entregas del dia y ordenar carga de trabajo por fecha.\par
+\par
+\b Configuracion\b0\par
+Permite administrar datos generales del sistema. Incluye datos del negocio, perfil del usuario, cambio de contrasena y gestion de usuarios. Si el usuario tiene rol ADMIN, tambien puede crear usuarios, editar usuarios, activar o desactivar usuarios y cambiar roles.\par
+\par
+\b 5. Recomendaciones de uso diario\b0\par
+1. Registrar al cliente antes de crear una cotizacion o trabajo.\par
+2. Crear la cotizacion con todos los items y montos claros.\par
+3. Convertir la cotizacion a trabajo cuando el cliente confirme.\par
+4. Registrar cada pago apenas se reciba.\par
+5. Mantener el inventario actualizado con entradas y salidas.\par
+6. Registrar los gastos el mismo dia para que caja y reportes sean confiables.\par
+7. Revisar calendario y dashboard al inicio de la jornada.\par
+\par
+\b 6. Buenas practicas\b0\par
+- No borrar informacion usada en operaciones reales si debe quedar historial.\par
+- Usar anulacion cuando una cotizacion ya tuvo uso o referencia.\par
+- Verificar montos antes de guardar pagos o gastos.\par
+- Actualizar el estado de los trabajos para mejorar reportes y calendario.\par
+- Mantener usuarios y contrasenas bajo control del administrador.\par
+\par
+\b 7. Errores comunes\b0\par
+\b No puedo eliminar una cotizacion\b0\par
+Solo se puede eliminar si esta en estado PENDIENTE y sin trabajo asociado. Si no cumple eso, debe anularse.\par
+\par
+\b No puedo editar una cotizacion\b0\par
+Puede ocurrir si ya fue convertida en trabajo o fue anulada.\par
+\par
+\b Un pago no aparece en caja\b0\par
+Revisar que el pago se haya guardado correctamente y que este asociado a un trabajo.\par
+\par
+\b Un gasto no aparece en caja\b0\par
+Revisar que el gasto se haya registrado correctamente.\par
+\par
+\b 8. Soporte interno\b0\par
+Si el sistema presenta un error: revisar permisos, volver a cargar la pagina, confirmar que el dato se haya guardado y comunicar el problema al encargado tecnico.\par
+\par
+\b 9. Resumen final\b0\par
+Este sistema fue pensado para ordenar la operacion de una vidrieria de forma simple. La recomendacion es usarlo siguiendo el flujo principal del negocio y evitando borrar informacion que ya forme parte del historial operativo.\par
+}

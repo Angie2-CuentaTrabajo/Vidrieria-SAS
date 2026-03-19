@@ -1,0 +1,150 @@
+{\rtf1\ansi\deff0
+{\fonttbl{\f0 Arial;}}
+\fs24
+\b Guia de Ejemplo de Llenado\b0\par
+Sistema de Gestion Vidrieria\par
+\par
+Este documento muestra un ejemplo simple de uso del sistema con datos de muestra. Sirve como guia para que el personal sepa que informacion registrar en cada paso.\par
+\par
+\b 1. Registrar cliente\b0\par
+Ir a Clientes y presionar Nuevo cliente.\par
+\par
+Llenar asi:\par
+- Nombre: Juan Perez\par
+- Telefono: 987654321\par
+- Direccion: Av. Los Olivos 123 - Lima\par
+- Documento: 45879632\par
+- Observacion: Cliente frecuente. Prefiere contacto por WhatsApp.\par
+\par
+\b 2. Crear cotizacion\b0\par
+Ir a Cotizaciones y presionar Nueva Cotizacion.\par
+\par
+Llenar asi:\par
+- Cliente: Juan Perez\par
+- Vigencia: 10 dias despues de la fecha actual\par
+- Descripcion del trabajo: Fabricacion e instalacion de mampara de vidrio templado para bano principal.\par
+\par
+Agregar items:\par
+Item 1\par
+- Descripcion: Vidrio templado 8 mm\par
+- Cantidad: 2\par
+- Unidad: m2\par
+- Precio: 180\par
+\par
+Item 2\par
+- Descripcion: Herrajes y accesorios\par
+- Cantidad: 1\par
+- Unidad: juego\par
+- Precio: 250\par
+\par
+Otros datos:\par
+- Mano de obra: 200\par
+- Descuento: 30\par
+- Observaciones: Incluye instalacion y sellado.\par
+\par
+\b 3. Aprobar o convertir la cotizacion\b0\par
+Abrir el detalle de la cotizacion.\par
+\par
+Opciones:\par
+- Si el cliente acepta, usar Aprobar cotizacion o Convertir en trabajo.\par
+- Si no acepta, usar Rechazar cotizacion.\par
+- Si ya no se usara pero debe quedar historial, usar Anular cotizacion.\par
+- Si aun esta pendiente y no tiene trabajo asociado, usar Eliminar cotizacion.\par
+\par
+\b 4. Crear o revisar trabajo\b0\par
+Si la cotizacion fue convertida, entrar a Trabajos.\par
+\par
+Verificar que el trabajo tenga:\par
+- Cliente: Juan Perez\par
+- Descripcion: Fabricacion e instalacion de mampara de vidrio templado para bano principal\par
+- Total: 780\par
+- Estado inicial: PENDIENTE\par
+\par
+Si se crea un trabajo manualmente, llenar por ejemplo:\par
+- Cliente: Juan Perez\par
+- Tipo de trabajo: Mampara\par
+- Descripcion: Instalacion de mampara corrediza para ducha\par
+- Total: 780\par
+- Adelanto inicial: 300\par
+- Fecha de entrega: 2026-03-25\par
+- Boleta: B001-245\par
+- Observaciones: Coordinar instalacion por la tarde\par
+\par
+\b 5. Registrar pago\b0\par
+Ir a Pagos y registrar un pago.\par
+\par
+Ejemplo:\par
+- Trabajo: Mampara corrediza para ducha\par
+- Monto: 300\par
+- Metodo: YAPE\par
+- Tipo: ADELANTO\par
+- Observacion: Adelanto confirmado por WhatsApp\par
+\par
+Resultado esperado:\par
+- baja el saldo pendiente del trabajo\par
+- aparece un ingreso en caja\par
+\par
+\b 6. Registrar inventario\b0\par
+Ir a Inventario.\par
+\par
+Crear producto ejemplo:\par
+- Nombre: Vidrio templado 8 mm\par
+- Categoria: Vidrios\par
+- Unidad: m2\par
+- Stock inicial: 15\par
+- Stock minimo: 5\par
+- Costo unitario: 120\par
+- Proveedor: Cristales del Peru\par
+- Observacion: Uso frecuente en mamparas\par
+\par
+Luego registrar una entrada:\par
+- Tipo: ENTRADA\par
+- Motivo: COMPRA\par
+- Cantidad: 10\par
+- Costo unitario: 120\par
+- Proveedor: Cristales del Peru\par
+- Referencia: Factura 001-458\par
+\par
+Luego registrar una salida:\par
+- Tipo: SALIDA\par
+- Motivo: USO_EN_TRABAJO\par
+- Cantidad: 2\par
+- Referencia: Trabajo de Juan Perez\par
+\par
+\b 7. Registrar gasto\b0\par
+Ir a Gastos y crear un gasto.\par
+\par
+Ejemplo:\par
+- Fecha: hoy\par
+- Descripcion: Compra de silicona y accesorios\par
+- Categoria: Materiales\par
+- Monto: 95\par
+- Referencia: Boleta 5487\par
+- Observacion: Compra para instalaciones del dia\par
+\par
+Resultado esperado: aparece una salida en caja.\par
+\par
+\b 8. Revisar caja\b0\par
+Ir a Caja y verificar:\par
+- ingreso por pago de 300\par
+- salida por gasto de 95\par
+- saldo actualizado\par
+\par
+\b 9. Revisar reportes\b0\par
+Ir a Reportes y verificar informacion como ingresos del periodo, gastos del periodo, utilidad neta, trabajos realizados y productos mas usados.\par
+\par
+\b 10. Revisar calendario\b0\par
+Ir a Calendario y verificar que el trabajo con fecha de entrega registrada aparezca en el dia correspondiente.\par
+\par
+\b Resumen del ejemplo\b0\par
+1. Cliente: Juan Perez\par
+2. Cotizacion: mampara de vidrio\par
+3. Trabajo: generado desde la cotizacion\par
+4. Pago: adelanto de 300\par
+5. Inventario: salida de materiales usados\par
+6. Gasto: compra de insumos\par
+7. Caja y reportes: actualizados automaticamente\par
+\par
+\b Recomendacion\b0\par
+Este documento puede compartirse con el personal como ejemplo base. Si quieres, luego puedo hacerte una version mas formal con espacios en blanco para imprimir y llenar manualmente como formato de capacitacion.\par
+}

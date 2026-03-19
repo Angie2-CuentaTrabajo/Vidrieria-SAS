@@ -1,0 +1,1 @@
+ALTER TYPE "EstadoCotizacion" ADD VALUE IF NOT EXISTS 'ANULADA';

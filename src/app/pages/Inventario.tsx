@@ -1,0 +1,382 @@
+import { useEffect, useMemo, useState } from 'react';
+import { Search, Plus, Package, ArrowDownCircle, ArrowUpCircle, Eye, Edit2 } from 'lucide-react';
+import { Card, CardContent } from '../components/ui/Card';
+import { Button } from '../components/ui/Button';
+import { Badge } from '../components/ui/Badge';
+import { Modal } from '../components/ui/Modal';
+import { Input } from '../components/ui/Input';
+import { Select } from '../components/ui/Select';
+import { Textarea } from '../components/ui/textarea';
+import { formatCurrency } from '../lib/utils';
+import { Link } from 'react-router';
+import { toast } from 'sonner';
+import {
+  createMovimientoInventario,
+  createProducto,
+  getProductos,
+  updateProducto,
+  type Producto,
+} from '../lib/inventario-api';
+
+type ProductoForm = {
+  nombre: string;
+  categoria: string;
+  unidad: string;
+  stockInicial: string;
+  stockMinimo: string;
+  costoUnitario: string;
+  proveedor: string;
+  observacion: string;
+};
+
+type MovimientoForm = {
+  productoId: string;
+  cantidad: string;
+  costoUnitario: string;
+  proveedor: string;
+  fecha: string;
+  observacion: string;
+  motivo: string;
+  referencia: string;
+};
+
+const emptyProductoForm: ProductoForm = {
+  nombre: '',
+  categoria: '',
+  unidad: 'm2',
+  stockInicial: '',
+  stockMinimo: '',
+  costoUnitario: '',
+  proveedor: '',
+  observacion: '',
+};
+
+const today = new Date().toISOString().split('T')[0];
+
+const emptyEntradaForm: MovimientoForm = {
+  productoId: '',
+  cantidad: '',
+  costoUnitario: '',
+  proveedor: '',
+  fecha: today,
+  observacion: '',
+  motivo: 'COMPRA',
+  referencia: '',
+};
+
+const emptySalidaForm: MovimientoForm = {
+  productoId: '',
+  cantidad: '',
+  costoUnitario: '',
+  proveedor: '',
+  fecha: today,
+  observacion: '',
+  motivo: 'USO_EN_TRABAJO',
+  referencia: '',
+};
+
+export default function Inventario() {
+  const [productos, setProductos] = useState<Producto[]>([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSavingProducto, setIsSavingProducto] = useState(false);
+  const [isSavingMovimiento, setIsSavingMovimiento] = useState(false);
+  const [isModalProductoOpen, setIsModalProductoOpen] = useState(false);
+  const [isModalEntradaOpen, setIsModalEntradaOpen] = useState(false);
+  const [isModalSalidaOpen, setIsModalSalidaOpen] = useState(false);
+  const [productoForm, setProductoForm] = useState<ProductoForm>(emptyProductoForm);
+  const [editingProducto, setEditingProducto] = useState<Producto | null>(null);
+  const [entradaForm, setEntradaForm] = useState<MovimientoForm>(emptyEntradaForm);
+  const [salidaForm, setSalidaForm] = useState<MovimientoForm>(emptySalidaForm);
+
+  useEffect(() => {
+    const loadProductos = async () => {
+      try {
+        const data = await getProductos();
+        setProductos(data);
+      } catch (error) {
+        toast.error(error instanceof Error ? error.message : 'No se pudo cargar el inventario');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    void loadProductos();
+  }, []);
+
+  const filteredProductos = useMemo(
+    () =>
+      productos.filter(
+        (producto) =>
+          producto.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          producto.categoria.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          (producto.proveedor || '').toLowerCase().includes(searchTerm.toLowerCase()),
+      ),
+    [productos, searchTerm],
+  );
+
+  const productosStockBajo = productos.filter((producto) => producto.stock < producto.stockMinimo);
+  const valorTotal = productos.reduce((sum, producto) => sum + producto.stock * producto.costo, 0);
+  const totalCategorias = new Set(productos.map((producto) => producto.categoria)).size;
+
+  function handleOpenProductoModal(producto?: Producto) {
+    if (producto) {
+      setEditingProducto(producto);
+      setProductoForm({
+        nombre: producto.nombre,
+        categoria: producto.categoria === 'Sin categoria' ? '' : producto.categoria,
+        unidad: producto.unidad,
+        stockInicial: String(producto.stock),
+        stockMinimo: String(producto.stockMinimo),
+        costoUnitario: String(producto.costo),
+        proveedor: producto.proveedor || '',
+        observacion: producto.observacion || '',
+      });
+    } else {
+      setEditingProducto(null);
+      setProductoForm(emptyProductoForm);
+    }
+
+    setIsModalProductoOpen(true);
+  }
+
+  function handleCloseProductoModal() {
+    setEditingProducto(null);
+    setProductoForm(emptyProductoForm);
+    setIsModalProductoOpen(false);
+  }
+
+  const handleSaveProducto = (event: React.FormEvent) => {
+    event.preventDefault();
+
+    const submit = async () => {
+      setIsSavingProducto(true);
+
+      try {
+        if (editingProducto) {
+          const producto = await updateProducto(editingProducto.id, {
+            nombre: productoForm.nombre,
+            categoria: productoForm.categoria,
+            unidad: productoForm.unidad,
+            stockMinimo: productoForm.stockMinimo,
+            costoUnitario: productoForm.costoUnitario,
+            proveedor: productoForm.proveedor,
+            observacion: productoForm.observacion,
+          });
+
+          setProductos((current) => current.map((item) => (item.id === producto.id ? producto : item)));
+          toast.success('Producto actualizado correctamente');
+        } else {
+          const producto = await createProducto(productoForm);
+          setProductos((current) => [producto, ...current]);
+          toast.success('Producto creado correctamente');
+        }
+
+        handleCloseProductoModal();
+      } catch (error) {
+        toast.error(error instanceof Error ? error.message : 'No se pudo guardar el producto');
+      } finally {
+        setIsSavingProducto(false);
+      }
+    };
+
+    void submit();
+  };
+
+  const handleMovimiento = (tipo: 'ENTRADA' | 'SALIDA', form: MovimientoForm) => {
+    const submit = async () => {
+      setIsSavingMovimiento(true);
+
+      try {
+        const result = await createMovimientoInventario(form.productoId, {
+          tipo,
+          motivo: form.motivo,
+          cantidad: form.cantidad,
+          costoUnitario: form.costoUnitario,
+          proveedor: form.proveedor,
+          referencia: form.referencia,
+          observacion: form.observacion,
+          fecha: form.fecha,
+        });
+
+        setProductos((current) =>
+          current.map((producto) => (producto.id === result.producto.id ? result.producto : producto)),
+        );
+
+        if (tipo === 'ENTRADA') {
+          setEntradaForm(emptyEntradaForm);
+          setIsModalEntradaOpen(false);
+          toast.success('Entrada registrada correctamente');
+        } else {
+          setSalidaForm(emptySalidaForm);
+          setIsModalSalidaOpen(false);
+          toast.success('Salida registrada correctamente');
+        }
+      } catch (error) {
+        toast.error(error instanceof Error ? error.message : 'No se pudo registrar el movimiento');
+      } finally {
+        setIsSavingMovimiento(false);
+      }
+    };
+
+    void submit();
+  };
+
+  return (
+    <div className="p-6 space-y-6">
+      <div className="flex items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Inventario</h1>
+          <p className="text-sm text-gray-600 mt-1">Control de productos y materiales</p>
+        </div>
+        <div className="flex gap-2 flex-wrap justify-end">
+          <Button variant="outline" onClick={() => setIsModalEntradaOpen(true)}>
+            <ArrowDownCircle className="w-4 h-4" />
+            Entrada
+          </Button>
+          <Button variant="outline" onClick={() => setIsModalSalidaOpen(true)}>
+            <ArrowUpCircle className="w-4 h-4" />
+            Salida
+          </Button>
+          <Button onClick={() => handleOpenProductoModal()}>
+            <Plus className="w-4 h-4" />
+            Nuevo Producto
+          </Button>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <Card><CardContent className="p-6"><div className="flex items-center justify-between"><div><p className="text-sm text-gray-600">Total productos</p><p className="text-2xl font-bold text-gray-900 mt-1">{productos.length}</p></div><div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center"><Package className="w-6 h-6 text-blue-600" /></div></div></CardContent></Card>
+        <Card><CardContent className="p-6"><div className="flex items-center justify-between"><div><p className="text-sm text-gray-600">Stock bajo</p><p className="text-2xl font-bold text-red-600 mt-1">{productosStockBajo.length}</p></div><div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center"><Package className="w-6 h-6 text-red-600" /></div></div></CardContent></Card>
+        <Card><CardContent className="p-6"><div className="flex items-center justify-between"><div><p className="text-sm text-gray-600">Valor total</p><p className="text-xl font-bold text-gray-900 mt-1">{formatCurrency(valorTotal)}</p></div><div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center"><Package className="w-6 h-6 text-green-600" /></div></div></CardContent></Card>
+        <Card><CardContent className="p-6"><div className="flex items-center justify-between"><div><p className="text-sm text-gray-600">Categorias</p><p className="text-2xl font-bold text-gray-900 mt-1">{totalCategorias}</p></div><div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center"><Package className="w-6 h-6 text-purple-600" /></div></div></CardContent></Card>
+      </div>
+
+      <Card>
+        <CardContent className="p-6">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Buscar por producto, categoria o proveedor..."
+              value={searchTerm}
+              onChange={(event) => setSearchTerm(event.target.value)}
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardContent className="p-0">
+          {isLoading ? (
+            <div className="px-6 py-12 text-center text-sm text-gray-500">Cargando inventario...</div>
+          ) : filteredProductos.length === 0 ? (
+            <div className="px-6 py-12 text-center text-sm text-gray-500">
+              {searchTerm ? 'No se encontraron productos con ese criterio.' : 'Todavia no hay productos registrados en inventario.'}
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50 border-b border-gray-200">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Producto</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Categoria</th>
+                    <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Unidad</th>
+                    <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Stock</th>
+                    <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Stock min.</th>
+                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Costo</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Proveedor</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Estado</th>
+                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {filteredProductos.map((producto) => (
+                    <tr key={producto.id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 text-sm font-medium text-gray-900">{producto.nombre}</td>
+                      <td className="px-6 py-4 text-sm text-gray-600">{producto.categoria}</td>
+                      <td className="px-6 py-4 text-sm text-gray-600 text-center">{producto.unidad}</td>
+                      <td className="px-6 py-4 text-sm text-gray-900 text-center font-semibold">{producto.stock}</td>
+                      <td className="px-6 py-4 text-sm text-gray-600 text-center">{producto.stockMinimo}</td>
+                      <td className="px-6 py-4 text-sm text-gray-900 text-right">{formatCurrency(producto.costo)}</td>
+                      <td className="px-6 py-4 text-sm text-gray-600">{producto.proveedor || '-'}</td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        {producto.stock < producto.stockMinimo ? <Badge variant="danger">Stock bajo</Badge> : <Badge variant="success">OK</Badge>}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          <Link to={`/dashboard/inventario/${producto.id}`}>
+                            <Button variant="ghost" size="sm">
+                              <Eye className="w-4 h-4" />
+                            </Button>
+                          </Link>
+                          <Button variant="ghost" size="sm" onClick={() => handleOpenProductoModal(producto)}>
+                            <Edit2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <Modal isOpen={isModalProductoOpen} onClose={handleCloseProductoModal} title={editingProducto ? 'Editar Producto' : 'Nuevo Producto'} size="md">
+        <form onSubmit={handleSaveProducto} className="space-y-4">
+          <Input label="Nombre del producto" value={productoForm.nombre} onChange={(event) => setProductoForm({ ...productoForm, nombre: event.target.value })} placeholder="Ej: Vidrio templado 6mm" required />
+          <Select label="Categoria" value={productoForm.categoria} onChange={(event) => setProductoForm({ ...productoForm, categoria: event.target.value })} options={[{ value: '', label: 'Seleccionar categoria' }, { value: 'Vidrios', label: 'Vidrios' }, { value: 'Espejos', label: 'Espejos' }, { value: 'Perfiles', label: 'Perfiles' }, { value: 'Accesorios', label: 'Accesorios' }]} required />
+          <Select label="Unidad" value={productoForm.unidad} onChange={(event) => setProductoForm({ ...productoForm, unidad: event.target.value })} options={[{ value: 'm2', label: 'm2' }, { value: 'm', label: 'm' }, { value: 'unid', label: 'Unidad' }]} required />
+          <div className="grid grid-cols-2 gap-4">
+            <Input label="Stock inicial" type="number" value={productoForm.stockInicial} onChange={(event) => setProductoForm({ ...productoForm, stockInicial: event.target.value })} placeholder="0" required={!editingProducto} disabled={Boolean(editingProducto)} />
+            <Input label="Stock minimo" type="number" value={productoForm.stockMinimo} onChange={(event) => setProductoForm({ ...productoForm, stockMinimo: event.target.value })} placeholder="0" required />
+          </div>
+          <Input label="Costo unitario" type="number" step="0.01" value={productoForm.costoUnitario} onChange={(event) => setProductoForm({ ...productoForm, costoUnitario: event.target.value })} placeholder="0.00" required />
+          <Input label="Proveedor" value={productoForm.proveedor} onChange={(event) => setProductoForm({ ...productoForm, proveedor: event.target.value })} placeholder="Nombre del proveedor" />
+          <Textarea label="Observacion" value={productoForm.observacion} onChange={(event) => setProductoForm({ ...productoForm, observacion: event.target.value })} rows={3} />
+
+          <div className="flex gap-3 pt-4">
+            <Button type="button" variant="outline" onClick={handleCloseProductoModal} className="flex-1">Cancelar</Button>
+            <Button type="submit" className="flex-1" disabled={isSavingProducto}>{isSavingProducto ? 'Guardando...' : editingProducto ? 'Actualizar' : 'Crear'}</Button>
+          </div>
+        </form>
+      </Modal>
+
+      <Modal isOpen={isModalEntradaOpen} onClose={() => setIsModalEntradaOpen(false)} title="Entrada de Inventario" size="md">
+        <form onSubmit={(event) => { event.preventDefault(); handleMovimiento('ENTRADA', entradaForm); }} className="space-y-4">
+          <Select label="Producto" value={entradaForm.productoId} onChange={(event) => setEntradaForm({ ...entradaForm, productoId: event.target.value })} options={[{ value: '', label: 'Seleccionar producto' }, ...productos.map((producto) => ({ value: producto.id, label: producto.nombre }))]} required />
+          <Input label="Cantidad" type="number" value={entradaForm.cantidad} onChange={(event) => setEntradaForm({ ...entradaForm, cantidad: event.target.value })} placeholder="0" required />
+          <Input label="Costo unitario" type="number" step="0.01" value={entradaForm.costoUnitario} onChange={(event) => setEntradaForm({ ...entradaForm, costoUnitario: event.target.value })} placeholder="0.00" />
+          <Input label="Proveedor" value={entradaForm.proveedor} onChange={(event) => setEntradaForm({ ...entradaForm, proveedor: event.target.value })} placeholder="Nombre del proveedor" />
+          <Input label="Referencia" value={entradaForm.referencia} onChange={(event) => setEntradaForm({ ...entradaForm, referencia: event.target.value })} placeholder="Factura, guia u otra referencia" />
+          <Input label="Fecha" type="date" value={entradaForm.fecha} onChange={(event) => setEntradaForm({ ...entradaForm, fecha: event.target.value })} required />
+          <Textarea label="Observacion" value={entradaForm.observacion} onChange={(event) => setEntradaForm({ ...entradaForm, observacion: event.target.value })} rows={3} />
+
+          <div className="flex gap-3 pt-4">
+            <Button type="button" variant="outline" onClick={() => setIsModalEntradaOpen(false)} className="flex-1">Cancelar</Button>
+            <Button type="submit" className="flex-1" disabled={isSavingMovimiento}>{isSavingMovimiento ? 'Guardando...' : 'Registrar'}</Button>
+          </div>
+        </form>
+      </Modal>
+
+      <Modal isOpen={isModalSalidaOpen} onClose={() => setIsModalSalidaOpen(false)} title="Salida de Inventario" size="md">
+        <form onSubmit={(event) => { event.preventDefault(); handleMovimiento('SALIDA', salidaForm); }} className="space-y-4">
+          <Select label="Producto" value={salidaForm.productoId} onChange={(event) => setSalidaForm({ ...salidaForm, productoId: event.target.value })} options={[{ value: '', label: 'Seleccionar producto' }, ...productos.map((producto) => ({ value: producto.id, label: producto.nombre }))]} required />
+          <Input label="Cantidad" type="number" value={salidaForm.cantidad} onChange={(event) => setSalidaForm({ ...salidaForm, cantidad: event.target.value })} placeholder="0" required />
+          <Select label="Motivo" value={salidaForm.motivo} onChange={(event) => setSalidaForm({ ...salidaForm, motivo: event.target.value })} options={[{ value: 'USO_EN_TRABAJO', label: 'Uso en trabajo' }, { value: 'VENTA_DIRECTA', label: 'Venta directa' }, { value: 'MERMA', label: 'Merma o rotura' }, { value: 'AJUSTE', label: 'Ajuste' }, { value: 'OTRO', label: 'Otro' }]} required />
+          <Input label="Referencia" value={salidaForm.referencia} onChange={(event) => setSalidaForm({ ...salidaForm, referencia: event.target.value })} placeholder="Trabajo asociado, venta u observacion corta" />
+          <Input label="Fecha" type="date" value={salidaForm.fecha} onChange={(event) => setSalidaForm({ ...salidaForm, fecha: event.target.value })} required />
+          <Textarea label="Observacion" value={salidaForm.observacion} onChange={(event) => setSalidaForm({ ...salidaForm, observacion: event.target.value })} rows={3} />
+
+          <div className="flex gap-3 pt-4">
+            <Button type="button" variant="outline" onClick={() => setIsModalSalidaOpen(false)} className="flex-1">Cancelar</Button>
+            <Button type="submit" variant="danger" className="flex-1" disabled={isSavingMovimiento}>{isSavingMovimiento ? 'Guardando...' : 'Registrar'}</Button>
+          </div>
+        </form>
+      </Modal>
+    </div>
+  );
+}

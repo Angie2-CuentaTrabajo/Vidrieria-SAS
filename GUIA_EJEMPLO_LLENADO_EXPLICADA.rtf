@@ -1,0 +1,203 @@
+{\rtf1\ansi\deff0
+{\fonttbl{\f0 Arial;}}
+\fs24
+\b Guia de Ejemplo de Llenado Explicada\b0\par
+Sistema de Gestion Vidrieria\par
+\par
+Este documento explica, con ejemplos simples, para que sirve cada campo principal del sistema y en que caso se usa dentro del negocio.\par
+\par
+\b 1. Clientes\b0\par
+El modulo Clientes sirve para registrar a las personas o empresas que solicitan trabajos.\par
+\par
+Campos y su uso:\par
+- Nombre: identifica al cliente en cotizaciones, trabajos, pagos, reportes y busquedas.\par
+- Telefono: permite contactarlo rapido por llamada o WhatsApp.\par
+- Direccion: sirve para ubicar instalaciones o entregas.\par
+- Documento: guarda DNI, RUC u otro dato util para control o comprobantes.\par
+- Observacion: permite anotar detalles importantes del cliente.\par
+\par
+Ejemplo:\par
+- Nombre: Juan Perez\par
+- Telefono: 987654321\par
+- Direccion: Av. Los Olivos 123 - Lima\par
+- Documento: 45879632\par
+- Observacion: Cliente frecuente. Prefiere contacto por WhatsApp.\par
+\par
+\b 2. Cotizaciones\b0\par
+El modulo Cotizaciones sirve para preparar presupuestos antes de confirmar un trabajo.\par
+\par
+Campos principales y su uso:\par
+- Cliente: asocia la cotizacion a una persona especifica.\par
+- Vigencia: indica hasta cuando el precio ofrecido es valido.\par
+- Descripcion del trabajo: resume claramente el servicio ofrecido.\par
+- Items: detallan materiales, accesorios o conceptos cobrados.\par
+\par
+Dentro de cada item:\par
+- Descripcion: explica que material o servicio parcial se cobra.\par
+- Cantidad: indica cuantas unidades o medidas se van a usar.\par
+- Unidad: aclara como se mide el item.\par
+- Precio: es el valor por cada unidad del item.\par
+- Mano de obra: cobra fabricacion, traslado o instalacion.\par
+- Descuento: reduce el total final si hay rebaja comercial.\par
+- Observaciones: agrega condiciones o aclaraciones.\par
+\par
+Uso en el negocio:\par
+- presentar un precio claro al cliente\par
+- justificar el monto cobrado\par
+- convertir luego el presupuesto en trabajo real\par
+- conservar historial aunque no se concrete\par
+\par
+Ejemplo:\par
+- Cliente: Juan Perez\par
+- Vigencia: 10 dias despues de la fecha actual\par
+- Descripcion del trabajo: Fabricacion e instalacion de mampara de vidrio templado para bano principal\par
+\par
+Item 1\par
+- Descripcion: Vidrio templado 8 mm\par
+- Cantidad: 2\par
+- Unidad: m2\par
+- Precio: 180\par
+\par
+Item 2\par
+- Descripcion: Herrajes y accesorios\par
+- Cantidad: 1\par
+- Unidad: juego\par
+- Precio: 250\par
+\par
+Otros campos:\par
+- Mano de obra: 200\par
+- Descuento: 30\par
+- Observaciones: Incluye instalacion y sellado\par
+\par
+\b 3. Trabajos\b0\par
+El modulo Trabajos sirve para registrar trabajos confirmados y hacer seguimiento hasta su entrega.\par
+\par
+Campos principales y su uso:\par
+- Cliente: indica a quien pertenece el trabajo.\par
+- Tipo de trabajo: clasifica el servicio.\par
+- Descripcion: explica el trabajo concreto.\par
+- Total: valor completo del trabajo.\par
+- Adelanto inicial: registra un pago inicial al crear el trabajo.\par
+- Fecha de entrega: planifica calendario y coordinacion.\par
+- Boleta: guarda el numero del comprobante.\par
+- Observaciones: deja instrucciones utiles.\par
+\par
+Uso en el negocio:\par
+- saber que trabajos estan pendientes\par
+- organizar entregas e instalaciones\par
+- controlar cuanto debe cada cliente\par
+- enlazar pagos y calendario\par
+\par
+Ejemplo:\par
+- Cliente: Juan Perez\par
+- Tipo de trabajo: Mampara\par
+- Descripcion: Instalacion de mampara corrediza para ducha\par
+- Total: 780\par
+- Adelanto inicial: 300\par
+- Fecha de entrega: 2026-03-25\par
+- Boleta: B001-245\par
+- Observaciones: Coordinar instalacion por la tarde\par
+\par
+\b 4. Pagos\b0\par
+El modulo Pagos sirve para registrar el dinero recibido de los clientes.\par
+\par
+Campos principales y su uso:\par
+- Trabajo: indica que trabajo esta pagando el cliente.\par
+- Monto: es la cantidad abonada y reduce el saldo pendiente.\par
+- Metodo: registra como se pago.\par
+- Tipo: clasifica si es adelanto, parcial o final.\par
+- Observacion: deja notas utiles sobre el pago.\par
+\par
+Uso en el negocio:\par
+- reducir el saldo del trabajo\par
+- registrar ingreso en caja\par
+- mantener orden financiero\par
+\par
+Ejemplo:\par
+- Trabajo: Mampara corrediza para ducha\par
+- Monto: 300\par
+- Metodo: YAPE\par
+- Tipo: ADELANTO\par
+- Observacion: Adelanto confirmado por WhatsApp\par
+\par
+\b 5. Inventario\b0\par
+El modulo Inventario sirve para controlar materiales y productos usados por la vidrieria.\par
+\par
+Campos principales del producto y su uso:\par
+- Nombre: identifica el material o producto.\par
+- Categoria: agrupa productos similares.\par
+- Unidad: indica como se mide el producto.\par
+- Stock inicial: cantidad con la que empieza el registro.\par
+- Stock minimo: alerta cuando conviene comprar.\par
+- Costo unitario: referencia de costo interno.\par
+- Proveedor: identifica a quien se compra.\par
+- Observacion: deja notas internas.\par
+\par
+Campos de movimientos y su uso:\par
+- Tipo: puede ser ENTRADA o SALIDA.\par
+- Motivo: explica por que se movio el stock.\par
+- Cantidad: indica cuanto entro o salio.\par
+- Referencia: relaciona el movimiento con factura, trabajo o nota.\par
+\par
+Uso en el negocio:\par
+- evitar faltantes de material\par
+- saber que productos se usan mas\par
+- controlar compras y consumo\par
+\par
+Ejemplo:\par
+- Nombre: Vidrio templado 8 mm\par
+- Categoria: Vidrios\par
+- Unidad: m2\par
+- Stock inicial: 15\par
+- Stock minimo: 5\par
+- Costo unitario: 120\par
+- Proveedor: Cristales del Peru\par
+- Observacion: Uso frecuente en mamparas\par
+\par
+Movimiento:\par
+- Tipo: SALIDA\par
+- Motivo: USO_EN_TRABAJO\par
+- Cantidad: 2\par
+- Referencia: Trabajo de Juan Perez\par
+\par
+\b 6. Gastos\b0\par
+El modulo Gastos sirve para registrar egresos del negocio.\par
+\par
+Campos principales y su uso:\par
+- Fecha: indica cuando se realizo el gasto.\par
+- Descripcion: resume de que fue el gasto.\par
+- Categoria: ordena gastos por tipo.\par
+- Monto: valor pagado.\par
+- Referencia: anota boleta, factura o codigo.\par
+- Observacion: guarda detalles adicionales.\par
+\par
+Uso en el negocio:\par
+- registrar salidas de dinero\par
+- reflejar el movimiento en caja\par
+- mejorar precision de reportes\par
+\par
+Ejemplo:\par
+- Fecha: hoy\par
+- Descripcion: Compra de silicona y accesorios\par
+- Categoria: Materiales\par
+- Monto: 95\par
+- Referencia: Boleta 5487\par
+- Observacion: Compra para instalaciones del dia\par
+\par
+\b 7. Caja\b0\par
+El modulo Caja sirve para ver ingresos, salidas y saldo general del negocio.\par
+\par
+\b 8. Reportes\b0\par
+El modulo Reportes sirve para analizar cuanto ingreso el negocio, cuanto gasto, cuanta utilidad genero, que trabajos se hacen mas y que clientes tienen saldo pendiente.\par
+\par
+\b 9. Calendario\b0\par
+El modulo Calendario usa las fechas de entrega de los trabajos para programar instalaciones, ordenar entregas y evitar cruces de fechas.\par
+\par
+\b 10. Reglas importantes de cotizaciones\b0\par
+- Si una cotizacion esta PENDIENTE y no tiene trabajo asociado, se puede eliminar.\par
+- Si la cotizacion ya fue usada, no conviene borrarla.\par
+- En ese caso se debe ANULAR para conservar historial.\par
+\par
+\b 11. Resumen\b0\par
+Cada campo del sistema apoya una parte real del negocio: cliente para identificar y contactar, cotizacion para vender, trabajo para producir, pago para cobrar, inventario para controlar materiales, gasto para registrar salidas, y caja y reportes para revisar resultados.\par
+}

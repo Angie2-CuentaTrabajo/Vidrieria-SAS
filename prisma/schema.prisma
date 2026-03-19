@@ -1,0 +1,367 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum RolUsuario {
+  ADMIN
+  OPERADOR
+}
+
+enum Moneda {
+  PEN
+  USD
+}
+
+enum EstadoCotizacion {
+  PENDIENTE
+  APROBADA
+  RECHAZADA
+  VENCIDA
+  ANULADA
+}
+
+enum EstadoTrabajo {
+  PENDIENTE
+  EN_PROCESO
+  TERMINADO
+  ENTREGADO
+  CANCELADO
+}
+
+enum MetodoPago {
+  EFECTIVO
+  TRANSFERENCIA
+  TARJETA
+  YAPE
+  PLIN
+  OTRO
+}
+
+enum TipoPago {
+  ADELANTO
+  PARCIAL
+  FINAL
+}
+
+enum TipoMovimientoInventario {
+  ENTRADA
+  SALIDA
+}
+
+enum MotivoMovimientoInventario {
+  COMPRA
+  USO_EN_TRABAJO
+  VENTA_DIRECTA
+  MERMA
+  AJUSTE
+  OTRO
+}
+
+enum TipoMovimientoCaja {
+  INGRESO
+  SALIDA
+}
+
+model Usuario {
+  id            String   @id @default(cuid())
+  nombre         String
+  email          String   @unique
+  telefono       String?
+  passwordHash   String
+  rol            RolUsuario @default(ADMIN)
+  activo         Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  cotizaciones   Cotizacion[]
+  trabajos       Trabajo[]
+  pagos          Pago[]
+  gastos         Gasto[]
+  movimientosInv MovimientoInventario[]
+  movimientosCaja MovimientoCaja[]
+}
+
+model Cliente {
+  id                String      @id @default(cuid())
+  nombre            String
+  telefono          String
+  direccion         String
+  documento         String?
+  observacion       String?
+  email             String?
+  activo            Boolean     @default(true)
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+
+  cotizaciones      Cotizacion[]
+  trabajos          Trabajo[]
+  pagos             Pago[]
+
+  @@index([nombre])
+  @@index([telefono])
+  @@index([documento])
+}
+
+model Cotizacion {
+  id                String           @id @default(cuid())
+  numero            String           @unique
+  clienteId         String
+  usuarioId         String?
+  fechaEmision      DateTime         @default(now())
+  fechaVigencia     DateTime
+  descripcion       String
+  manoObra          Decimal          @db.Decimal(12, 2)
+  subtotal          Decimal          @db.Decimal(12, 2)
+  descuento         Decimal          @default(0) @db.Decimal(12, 2)
+  total             Decimal          @db.Decimal(12, 2)
+  estado            EstadoCotizacion @default(PENDIENTE)
+  observaciones     String?
+  trabajoConvertido Boolean          @default(false)
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+
+  cliente           Cliente          @relation(fields: [clienteId], references: [id])
+  usuario           Usuario?         @relation(fields: [usuarioId], references: [id])
+  items             CotizacionItem[]
+  trabajo           Trabajo?
+
+  @@index([clienteId])
+  @@index([estado])
+  @@index([fechaEmision])
+}
+
+model CotizacionItem {
+  id             String    @id @default(cuid())
+  cotizacionId   String
+  descripcion    String
+  cantidad       Decimal   @db.Decimal(12, 3)
+  unidad         String
+  precioUnitario Decimal   @db.Decimal(12, 2)
+  total          Decimal   @db.Decimal(12, 2)
+  orden          Int       @default(0)
+
+  cotizacion     Cotizacion @relation(fields: [cotizacionId], references: [id], onDelete: Cascade)
+
+  @@index([cotizacionId])
+}
+
+model TipoTrabajo {
+  id          String    @id @default(cuid())
+  nombre      String    @unique
+  descripcion String?
+  activo      Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  trabajos    Trabajo[]
+}
+
+model Trabajo {
+  id                    String        @id @default(cuid())
+  numero                String        @unique
+  clienteId             String
+  cotizacionId          String?       @unique
+  tipoTrabajoId         String?
+  usuarioId             String?
+  fechaRegistro         DateTime      @default(now())
+  fechaEntrega          DateTime?
+  descripcion           String
+  direccionInstalacion  String?
+  observaciones         String?
+  comprobanteNumero     String?
+  total                 Decimal       @db.Decimal(12, 2)
+  adelanto              Decimal       @default(0) @db.Decimal(12, 2)
+  saldo                 Decimal       @default(0) @db.Decimal(12, 2)
+  estado                EstadoTrabajo @default(PENDIENTE)
+  createdAt             DateTime      @default(now())
+  updatedAt             DateTime      @updatedAt
+
+  cliente               Cliente       @relation(fields: [clienteId], references: [id])
+  cotizacion            Cotizacion?   @relation(fields: [cotizacionId], references: [id])
+  tipoTrabajo           TipoTrabajo?  @relation(fields: [tipoTrabajoId], references: [id])
+  usuario               Usuario?      @relation(fields: [usuarioId], references: [id])
+  pagos                 Pago[]
+  materiales            TrabajoMaterial[]
+  movimientosCaja       MovimientoCaja[]
+  movimientosInventario MovimientoInventario[]
+
+  @@index([clienteId])
+  @@index([tipoTrabajoId])
+  @@index([estado])
+  @@index([fechaEntrega])
+}
+
+model TrabajoMaterial {
+  id          String   @id @default(cuid())
+  trabajoId    String
+  productoId   String
+  cantidad     Decimal  @db.Decimal(12, 3)
+  unidad       String
+  costoUnitario Decimal? @db.Decimal(12, 2)
+  subtotal     Decimal? @db.Decimal(12, 2)
+  observacion  String?
+
+  trabajo      Trabajo  @relation(fields: [trabajoId], references: [id], onDelete: Cascade)
+  producto     Producto @relation(fields: [productoId], references: [id])
+
+  @@index([trabajoId])
+  @@index([productoId])
+}
+
+model Pago {
+  id              String      @id @default(cuid())
+  clienteId        String
+  trabajoId        String?
+  usuarioId        String?
+  fecha            DateTime   @default(now())
+  monto            Decimal    @db.Decimal(12, 2)
+  metodo           MetodoPago
+  tipo             TipoPago
+  observacion      String?
+  referenciaExterna String?
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+
+  cliente          Cliente    @relation(fields: [clienteId], references: [id])
+  trabajo          Trabajo?   @relation(fields: [trabajoId], references: [id])
+  usuario          Usuario?   @relation(fields: [usuarioId], references: [id])
+  movimientoCaja   MovimientoCaja?
+
+  @@index([clienteId])
+  @@index([trabajoId])
+  @@index([fecha])
+  @@index([metodo])
+}
+
+model CategoriaInventario {
+  id          String    @id @default(cuid())
+  nombre      String    @unique
+  descripcion String?
+  activo      Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  productos   Producto[]
+}
+
+model Producto {
+  id                String      @id @default(cuid())
+  nombre            String
+  categoriaId       String?
+  unidad            String
+  stockActual       Decimal     @default(0) @db.Decimal(12, 3)
+  stockMinimo       Decimal     @default(0) @db.Decimal(12, 3)
+  costoUnitario     Decimal     @default(0) @db.Decimal(12, 2)
+  proveedor         String?
+  observacion       String?
+  activo            Boolean     @default(true)
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+
+  categoria         CategoriaInventario? @relation(fields: [categoriaId], references: [id])
+  movimientos       MovimientoInventario[]
+  materialesTrabajo TrabajoMaterial[]
+
+  @@index([nombre])
+  @@index([categoriaId])
+}
+
+model MovimientoInventario {
+  id              String                     @id @default(cuid())
+  productoId       String
+  usuarioId        String?
+  trabajoId        String?
+  fecha            DateTime                   @default(now())
+  tipo             TipoMovimientoInventario
+  motivo           MotivoMovimientoInventario
+  cantidad         Decimal                    @db.Decimal(12, 3)
+  costoUnitario    Decimal?                   @db.Decimal(12, 2)
+  referencia       String?
+  proveedor        String?
+  observacion      String?
+  createdAt        DateTime                   @default(now())
+
+  producto         Producto                   @relation(fields: [productoId], references: [id])
+  usuario          Usuario?                   @relation(fields: [usuarioId], references: [id])
+  trabajo          Trabajo?                   @relation(fields: [trabajoId], references: [id])
+
+  @@index([productoId])
+  @@index([trabajoId])
+  @@index([fecha])
+  @@index([tipo, motivo])
+}
+
+model CategoriaGasto {
+  id          String    @id @default(cuid())
+  nombre      String    @unique
+  descripcion String?
+  activo      Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  gastos      Gasto[]
+}
+
+model Gasto {
+  id             String      @id @default(cuid())
+  categoriaId     String?
+  usuarioId       String?
+  fecha           DateTime    @default(now())
+  descripcion     String
+  monto           Decimal     @db.Decimal(12, 2)
+  referencia      String?
+  observacion     String?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  categoria       CategoriaGasto? @relation(fields: [categoriaId], references: [id])
+  usuario         Usuario?        @relation(fields: [usuarioId], references: [id])
+  movimientoCaja  MovimientoCaja?
+
+  @@index([categoriaId])
+  @@index([fecha])
+}
+
+model MovimientoCaja {
+  id           String             @id @default(cuid())
+  usuarioId     String?
+  trabajoId     String?
+  pagoId        String?            @unique
+  gastoId       String?            @unique
+  fecha         DateTime           @default(now())
+  tipo          TipoMovimientoCaja
+  descripcion   String
+  monto         Decimal            @db.Decimal(12, 2)
+  referencia    String?
+  createdAt     DateTime           @default(now())
+
+  usuario       Usuario?           @relation(fields: [usuarioId], references: [id])
+  trabajo       Trabajo?           @relation(fields: [trabajoId], references: [id])
+  pago          Pago?              @relation(fields: [pagoId], references: [id])
+  gasto         Gasto?             @relation(fields: [gastoId], references: [id])
+
+  @@index([fecha])
+  @@index([tipo])
+  @@index([trabajoId])
+}
+
+model ConfiguracionNegocio {
+  id                   String   @id @default(cuid())
+  nombreComercial      String
+  razonSocial          String?
+  ruc                  String?
+  telefono             String?
+  email                String?
+  direccion            String?
+  moneda               Moneda   @default(PEN)
+  logoUrl              String?
+  stockMinimoPorDefecto Decimal @default(5) @db.Decimal(12, 3)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+}

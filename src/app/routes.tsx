@@ -1,0 +1,56 @@
+import { createBrowserRouter } from 'react-router';
+import Login from './pages/Login';
+import Layout from './components/Layout';
+import Dashboard from './pages/Dashboard';
+import Clientes from './pages/Clientes';
+import ClienteDetalle from './pages/ClienteDetalle';
+import Cotizaciones from './pages/Cotizaciones';
+import CotizacionDetalle from './pages/CotizacionDetalle';
+import Trabajos from './pages/Trabajos';
+import TrabajoDetalle from './pages/TrabajoDetalle';
+import Pagos from './pages/Pagos';
+import Inventario from './pages/Inventario';
+import ProductoDetalle from './pages/ProductoDetalle';
+import Gastos from './pages/Gastos';
+import Caja from './pages/Caja';
+import Reportes from './pages/Reportes';
+import Configuracion from './pages/Configuracion';
+import Calendario from './pages/Calendario';
+import RequireAuth from './components/RequireAuth';
+
+export const router = createBrowserRouter([
+  {
+    path: '/',
+    element: <Login />,
+  },
+  {
+    path: '/login',
+    element: <Login />,
+  },
+  {
+    element: <RequireAuth />,
+    children: [
+      {
+        path: '/dashboard',
+        Component: Layout,
+        children: [
+          { index: true, Component: Dashboard },
+          { path: 'clientes', Component: Clientes },
+          { path: 'clientes/:id', Component: ClienteDetalle },
+          { path: 'cotizaciones', Component: Cotizaciones },
+          { path: 'cotizaciones/:id', Component: CotizacionDetalle },
+          { path: 'trabajos', Component: Trabajos },
+          { path: 'trabajos/:id', Component: TrabajoDetalle },
+          { path: 'pagos', Component: Pagos },
+          { path: 'inventario', Component: Inventario },
+          { path: 'inventario/:id', Component: ProductoDetalle },
+          { path: 'gastos', Component: Gastos },
+          { path: 'caja', Component: Caja },
+          { path: 'reportes', Component: Reportes },
+          { path: 'configuracion', Component: Configuracion },
+          { path: 'calendario', Component: Calendario },
+        ],
+      },
+    ],
+  },
+]);
