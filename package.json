@@ -9,6 +9,8 @@
     "dev:full": "concurrently -k \"npm:api:dev\" \"npm:dev\"",
     "demo:seed": "node prisma/seed-demo.js",
     "demo:seed:reset": "node prisma/seed-demo.js --reset",
+    "demo:seed:cliente": "node prisma/seed-demo-cliente.js",
+    "demo:seed:cliente:reset": "node prisma/seed-demo-cliente.js --reset",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:studio": "prisma studio",
