@@ -1039,6 +1039,22 @@ app.get('/api/configuracion', async (req, res) => {
   }
 });
 
+app.get('/api/configuracion/publica', async (_req, res) => {
+  try {
+    const configuracion = await ensureConfiguracionNegocio();
+
+    res.json({
+      negocio: {
+        nombreComercial: configuracion.nombreComercial,
+        logoUrl: configuracion.logoUrl,
+      },
+    });
+  } catch (error) {
+    console.error('Error al cargar configuración pública:', error);
+    res.status(500).json({ message: 'No se pudo cargar la configuración pública.' });
+  }
+});
+
 app.put('/api/configuracion', async (req, res) => {
   try {
     const usuario = await getAuthenticatedUser(req);
