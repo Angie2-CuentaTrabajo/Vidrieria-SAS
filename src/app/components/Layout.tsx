@@ -67,15 +67,20 @@ export default function Layout() {
 
   return (
     <div className="flex min-h-screen bg-gray-50">
-      <aside className="hidden lg:flex w-64 bg-slate-900 text-white flex-col fixed h-full">
-        <div className="px-6 py-6 border-b border-slate-800">
+      <aside
+        className="fixed hidden h-full w-64 flex-col text-white lg:flex"
+        style={{
+          backgroundImage: 'linear-gradient(180deg, var(--sidebar-from), var(--sidebar-to))',
+        }}
+      >
+        <div className="px-6 py-6" style={{ borderBottom: '1px solid var(--sidebar-border-strong)' }}>
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-[var(--brand-600)] text-[var(--brand-contrast)]">
               <Package className="w-6 h-6" />
             </div>
             <div>
               <h1 className="font-semibold text-lg">Sistema de Gestion</h1>
-              <p className="text-xs text-slate-400">Vidrieria</p>
+              <p className="text-xs text-white/70">Vidrieria</p>
             </div>
           </div>
         </div>
@@ -92,8 +97,19 @@ export default function Layout() {
                     to={item.path}
                     className={cn(
                       'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors',
-                      isActive ? 'bg-[var(--brand-600)] text-[var(--brand-contrast)]' : 'text-slate-300 hover:bg-slate-800 hover:text-white',
+                      isActive ? 'bg-[var(--brand-600)] text-[var(--brand-contrast)] shadow-sm' : 'text-white/80 hover:text-white',
                     )}
+                    style={!isActive ? { backgroundColor: 'transparent' } : undefined}
+                    onMouseEnter={(event) => {
+                      if (!isActive) {
+                        event.currentTarget.style.backgroundColor = 'var(--sidebar-hover)';
+                      }
+                    }}
+                    onMouseLeave={(event) => {
+                      if (!isActive) {
+                        event.currentTarget.style.backgroundColor = 'transparent';
+                      }
+                    }}
                   >
                     <Icon className="w-5 h-5" />
                     <span>{item.label}</span>
@@ -104,10 +120,16 @@ export default function Layout() {
           </ul>
         </nav>
 
-        <div className="px-3 py-4 border-t border-slate-800">
+        <div className="px-3 py-4" style={{ borderTop: '1px solid var(--sidebar-border-strong)' }}>
           <button
             onClick={handleLogout}
-            className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-colors w-full"
+            className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-white/80 transition-colors hover:text-white"
+            onMouseEnter={(event) => {
+              event.currentTarget.style.backgroundColor = 'var(--sidebar-hover)';
+            }}
+            onMouseLeave={(event) => {
+              event.currentTarget.style.backgroundColor = 'transparent';
+            }}
           >
             <LogOut className="w-5 h-5" />
             <span>Cerrar sesion</span>

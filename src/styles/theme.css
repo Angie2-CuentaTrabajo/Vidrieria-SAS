@@ -10,6 +10,10 @@
   --hero-from: #0f172a;
   --hero-via: #172554;
   --hero-to: #0c4a6e;
+  --sidebar-from: #0f172a;
+  --sidebar-to: #172554;
+  --sidebar-hover: rgba(255, 255, 255, 0.08);
+  --sidebar-border-strong: rgba(255, 255, 255, 0.08);
   --background: #ffffff;
   --foreground: oklch(0.145 0 0);
   --card: #ffffff;
@@ -58,6 +62,10 @@
   --hero-from: #0f172a;
   --hero-via: #172554;
   --hero-to: #0c4a6e;
+  --sidebar-from: #0f172a;
+  --sidebar-to: #172554;
+  --sidebar-hover: rgba(255, 255, 255, 0.08);
+  --sidebar-border-strong: rgba(255, 255, 255, 0.08);
 }
 
 :root[data-theme-palette='esmeralda'] {
@@ -69,6 +77,10 @@
   --hero-from: #052e2b;
   --hero-via: #065f46;
   --hero-to: #0f766e;
+  --sidebar-from: #052e2b;
+  --sidebar-to: #065f46;
+  --sidebar-hover: rgba(255, 255, 255, 0.08);
+  --sidebar-border-strong: rgba(255, 255, 255, 0.08);
 }
 
 :root[data-theme-palette='terracota'] {
@@ -80,6 +92,10 @@
   --hero-from: #431407;
   --hero-via: #9a3412;
   --hero-to: #b45309;
+  --sidebar-from: #431407;
+  --sidebar-to: #9a3412;
+  --sidebar-hover: rgba(255, 255, 255, 0.08);
+  --sidebar-border-strong: rgba(255, 255, 255, 0.08);
 }
 
 :root[data-theme-palette='grafito'] {
@@ -91,6 +107,10 @@
   --hero-from: #0f172a;
   --hero-via: #1e293b;
   --hero-to: #334155;
+  --sidebar-from: #0f172a;
+  --sidebar-to: #1e293b;
+  --sidebar-hover: rgba(255, 255, 255, 0.08);
+  --sidebar-border-strong: rgba(255, 255, 255, 0.08);
 }
 
 .dark {
