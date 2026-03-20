@@ -85,18 +85,6 @@ export default function Login() {
               </div>
             </div>
 
-            <div
-              className="rounded-lg px-4 py-3 text-sm"
-              style={{
-                border: '1px solid color-mix(in srgb, var(--brand-100) 90%, white)',
-                background: 'color-mix(in srgb, var(--brand-50) 80%, white)',
-                color: 'var(--brand-700)',
-              }}
-            >
-              Usuario inicial: <strong>admin@vidrieria.com</strong><br />
-              Clave inicial: <strong>admin123</strong>
-            </div>
-
             <Button type="submit" variant="primary" className="w-full py-2.5" disabled={loading}>
               {loading ? 'Ingresando...' : 'Ingresar'}
             </Button>

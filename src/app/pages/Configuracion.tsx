@@ -64,6 +64,7 @@ export default function Configuracion() {
   const [usuarios, setUsuarios] = useState<UsuarioSistema[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSavingNegocio, setIsSavingNegocio] = useState(false);
+  const [isSavingTheme, setIsSavingTheme] = useState(false);
   const [isSavingUsuario, setIsSavingUsuario] = useState(false);
   const [isSavingPassword, setIsSavingPassword] = useState(false);
   const [isSavingSystemUser, setIsSavingSystemUser] = useState(false);
@@ -152,6 +153,25 @@ export default function Configuracion() {
       toast.error(error instanceof Error ? error.message : 'No se pudo actualizar el negocio.');
     } finally {
       setIsSavingNegocio(false);
+    }
+  }
+
+  async function handleGuardarColores() {
+    setIsSavingTheme(true);
+
+    try {
+      await updateConfiguracion({
+        ...datosNegocio,
+        contentPalette,
+        sidebarPalette,
+        contentCustomColor: contentPalette === 'personalizado' ? contentCustomColor : '',
+        sidebarCustomColor: sidebarPalette === 'personalizado' ? sidebarCustomColor : '',
+      });
+      toast.success('Colores guardados para todos los usuarios');
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'No se pudieron guardar los colores.');
+    } finally {
+      setIsSavingTheme(false);
     }
   }
 
@@ -530,7 +550,13 @@ export default function Configuracion() {
           </div>
 
           <div className="rounded-2xl border border-gray-200 bg-gray-50 p-4 text-sm text-gray-600">
-            Estos colores forman parte de la configuración del negocio. Cuando guardes cambios, quedarán listos como preferencia general para todos.
+            Los colores se ven al instante para que puedas probarlos. Usa el botón de abajo para dejarlos guardados como preferencia general del negocio.
+          </div>
+          <div className="flex justify-end">
+            <Button type="button" onClick={handleGuardarColores} disabled={isSavingTheme || isLoading}>
+              <Save className="w-4 h-4" />
+              {isSavingTheme ? 'Guardando colores...' : 'Guardar colores'}
+            </Button>
           </div>
         </CardContent>
       </Card>
