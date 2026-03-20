@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
-import { Package, Lock, User } from 'lucide-react';
+import { Package, Lock, User, Eye, EyeOff } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { toast } from 'sonner';
 import { login } from '../lib/auth-api';
@@ -10,6 +10,7 @@ export default function Login() {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const handleLogin = async (event: React.FormEvent) => {
@@ -22,7 +23,7 @@ export default function Login() {
       toast.success('Bienvenido al sistema');
       navigate('/dashboard');
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'No se pudo iniciar sesion');
+      toast.error(error instanceof Error ? error.message : 'No se pudo iniciar sesión');
     } finally {
       setLoading(false);
     }
@@ -40,13 +41,13 @@ export default function Login() {
           <div className="mb-4 inline-flex h-20 w-20 items-center justify-center rounded-2xl bg-[var(--brand-600)] text-[var(--brand-contrast)] shadow-lg">
             <Package className="w-12 h-12 text-white" />
           </div>
-          <h1 className="text-3xl font-bold text-white mb-2">Sistema de Gestion</h1>
-          <p className="text-white/75">Vidrieria</p>
+          <h1 className="text-3xl font-bold text-white mb-2">Sistema de Gestión</h1>
+          <p className="text-white/75">Vidriería</p>
         </div>
 
         <div className="bg-white rounded-2xl shadow-2xl p-8">
           <div className="mb-6">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-2">Iniciar sesion</h2>
+            <h2 className="text-2xl font-semibold text-gray-900 mb-2">Iniciar sesión</h2>
             <p className="text-sm text-gray-600">Ingrese sus credenciales para acceder</p>
           </div>
 
@@ -70,18 +71,26 @@ export default function Login() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Contrasena</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">Contraseña</label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input
-                  type="password"
+                  type={showPassword ? 'text' : 'password'}
                   name="login_password"
                   value={password}
                   onChange={(event) => setPassword(event.target.value)}
-                  placeholder="Ingrese su contrasena"
+                  placeholder="Ingrese su contraseña"
                   autoComplete="new-password"
-                  className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[color:var(--brand-600)] focus:border-transparent"
+                  className="w-full pl-10 pr-12 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[color:var(--brand-600)] focus:border-transparent"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((current) => !current)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 transition-colors hover:text-gray-600"
+                  aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                >
+                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
               </div>
             </div>
 
@@ -91,7 +100,7 @@ export default function Login() {
           </form>
         </div>
 
-        <p className="mt-6 text-center text-sm text-white/75">Version 1.0.0 - 2026</p>
+        <p className="mt-6 text-center text-sm text-white/75">Versión 1.0.0 - 2026</p>
       </div>
     </div>
   );
