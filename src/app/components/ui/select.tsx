@@ -19,7 +19,7 @@ function Select({ className, label, helperText, id, options, children, ...props 
       id={id}
       data-slot="select"
       className={cn(
-        "flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 disabled:cursor-not-allowed disabled:opacity-50",
+        "flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 outline-none transition focus:border-[var(--brand-600)] focus:ring-2 focus:ring-[color:var(--brand-600)]/20 disabled:cursor-not-allowed disabled:opacity-50",
         className,
       )}
       {...props}

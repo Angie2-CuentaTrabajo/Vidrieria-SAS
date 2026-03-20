@@ -180,7 +180,12 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6 p-6">
-      <section className="overflow-hidden rounded-3xl border border-slate-200 bg-gradient-to-br from-slate-900 via-blue-950 to-sky-900 text-white shadow-xl">
+      <section
+        className="overflow-hidden rounded-3xl border border-slate-200 text-white shadow-xl"
+        style={{
+          backgroundImage: 'linear-gradient(135deg, var(--hero-from), var(--hero-via), var(--hero-to))',
+        }}
+      >
         <div className="grid gap-8 px-6 py-7 lg:grid-cols-[1.5fr_1fr] lg:px-8">
           <div className="space-y-5">
             <div className="inline-flex items-center rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-medium uppercase tracking-[0.2em] text-sky-100">
@@ -322,7 +327,7 @@ export default function Dashboard() {
               <CardTitle>Ultimos trabajos</CardTitle>
               <CardDescription>Los registros mas recientes para seguimiento rapido.</CardDescription>
             </div>
-            <Link to="/dashboard/trabajos" className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-700">
+            <Link to="/dashboard/trabajos" className="flex items-center gap-1 text-sm text-[var(--brand-600)] hover:opacity-80">
               Ver todos <ArrowRight className="w-4 h-4" />
             </Link>
           </CardHeader>
@@ -365,7 +370,7 @@ export default function Dashboard() {
               <CardTitle>Pagos recientes</CardTitle>
               <CardDescription>Ultimos ingresos registrados en el sistema.</CardDescription>
             </div>
-            <Link to="/dashboard/pagos" className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-700">
+            <Link to="/dashboard/pagos" className="flex items-center gap-1 text-sm text-[var(--brand-600)] hover:opacity-80">
               Ver todos <ArrowRight className="w-4 h-4" />
             </Link>
           </CardHeader>

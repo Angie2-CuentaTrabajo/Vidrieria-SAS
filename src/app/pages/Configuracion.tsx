@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Save, Building, User, DollarSign, Package as PackageIcon, Briefcase, Shield, KeyRound, Plus, Edit2 } from 'lucide-react';
+import { Save, Building, User, Package as PackageIcon, Shield, KeyRound, Plus, Edit2, Palette } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
@@ -17,6 +17,12 @@ import {
   type UsuarioSistema,
 } from '../lib/configuracion-api';
 import { getAuthSession } from '../lib/auth';
+import {
+  applyThemePalette,
+  getStoredThemePalette,
+  themePalettes,
+  type ThemePaletteId,
+} from '../lib/theme-preferences';
 
 const defaultNegocio = {
   nombreComercial: '',
@@ -58,6 +64,7 @@ export default function Configuracion() {
   const [isUserModalOpen, setIsUserModalOpen] = useState(false);
   const [editingSystemUser, setEditingSystemUser] = useState<UsuarioSistema | null>(null);
   const [userForm, setUserForm] = useState(defaultUserForm);
+  const [themePalette, setThemePalette] = useState<ThemePaletteId>(getStoredThemePalette().id);
 
   const currentSession = getAuthSession();
   const isAdmin = currentSession?.user.rol === 'ADMIN';
@@ -216,6 +223,12 @@ export default function Configuracion() {
     }
   }
 
+  function handlePaletteChange(paletteId: ThemePaletteId) {
+    setThemePalette(paletteId);
+    applyThemePalette(paletteId);
+    toast.success('Colores del sistema actualizados');
+  }
+
   return (
     <div className="p-6 space-y-6 max-w-5xl">
       <div>
@@ -266,6 +279,63 @@ export default function Configuracion() {
               </Button>
             </div>
           </form>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-[var(--brand-100)]">
+              <Palette className="w-5 h-5 text-[var(--brand-600)]" />
+            </div>
+            <div>
+              <CardTitle>Colores del sistema</CardTitle>
+              <p className="text-sm text-gray-600">Elige la paleta visual para dashboard, botones y pantallas principales.</p>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid gap-4 md:grid-cols-2">
+            {themePalettes.map((palette) => {
+              const isActive = themePalette === palette.id;
+
+              return (
+                <button
+                  key={palette.id}
+                  type="button"
+                  onClick={() => handlePaletteChange(palette.id)}
+                  className={`rounded-2xl border p-4 text-left transition ${
+                    isActive ? 'border-gray-900 shadow-md' : 'border-gray-200 hover:border-gray-300'
+                  }`}
+                >
+                  <div
+                    className="mb-4 h-24 rounded-xl"
+                    style={{
+                      backgroundImage: `linear-gradient(135deg, ${palette.heroFrom}, ${palette.heroVia}, ${palette.heroTo})`,
+                    }}
+                  />
+                  <div className="flex items-center justify-between gap-3">
+                    <div>
+                      <p className="font-semibold text-gray-900">{palette.name}</p>
+                      <p className="mt-1 text-sm text-gray-600">{palette.description}</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="h-5 w-5 rounded-full border border-white shadow-sm" style={{ backgroundColor: palette.accent }} />
+                      <span className="h-5 w-5 rounded-full border border-white shadow-sm" style={{ backgroundColor: palette.accentSoft }} />
+                      <span className="h-5 w-5 rounded-full border border-white shadow-sm" style={{ backgroundColor: palette.heroTo }} />
+                    </div>
+                  </div>
+                  <div className="mt-4 flex items-center justify-between text-sm">
+                    <span className="text-gray-500">{isActive ? 'Paleta activa' : 'Usar esta paleta'}</span>
+                    {isActive ? <span className="font-medium text-[var(--brand-600)]">Seleccionada</span> : null}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+          <div className="rounded-2xl border border-gray-200 bg-gray-50 p-4 text-sm text-gray-600">
+            Este cambio se guarda en el navegador actual. Si luego quieres, puedo hacer que tambien se guarde en la base de datos para que todos vean el mismo color por defecto.
+          </div>
         </CardContent>
       </Card>
 

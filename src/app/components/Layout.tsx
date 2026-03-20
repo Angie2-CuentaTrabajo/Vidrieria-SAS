@@ -70,7 +70,7 @@ export default function Layout() {
       <aside className="hidden lg:flex w-64 bg-slate-900 text-white flex-col fixed h-full">
         <div className="px-6 py-6 border-b border-slate-800">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+            <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-[var(--brand-600)] text-[var(--brand-contrast)]">
               <Package className="w-6 h-6" />
             </div>
             <div>
@@ -92,7 +92,7 @@ export default function Layout() {
                     to={item.path}
                     className={cn(
                       'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors',
-                      isActive ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white',
+                      isActive ? 'bg-[var(--brand-600)] text-[var(--brand-contrast)]' : 'text-slate-300 hover:bg-slate-800 hover:text-white',
                     )}
                   >
                     <Icon className="w-5 h-5" />
@@ -124,7 +124,7 @@ export default function Layout() {
                 <input
                   type="text"
                   placeholder="Buscar clientes, trabajos, pagos..."
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full rounded-lg border border-gray-300 py-2 pl-10 pr-4 text-sm focus:border-transparent focus:outline-none focus:ring-2 focus:ring-[color:var(--brand-600)]"
                 />
               </div>
             </div>
@@ -140,7 +140,7 @@ export default function Layout() {
                   <p className="text-sm font-medium text-gray-900">{user?.nombre || 'Usuario'}</p>
                   <p className="text-xs text-gray-500">{user?.email || '-'}</p>
                 </div>
-                <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-medium">
+                <div className="w-10 h-10 rounded-full flex items-center justify-center font-medium bg-[var(--brand-600)] text-[var(--brand-contrast)]">
                   {(user?.nombre || 'U').charAt(0).toUpperCase()}
                 </div>
               </div>
@@ -159,7 +159,7 @@ export default function Layout() {
                     to={item.path}
                     className={cn(
                       'flex items-center gap-2 rounded-full border px-3 py-2 text-sm font-medium whitespace-nowrap transition-colors',
-                      isActive ? 'border-blue-600 bg-blue-600 text-white' : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50',
+                      isActive ? 'border-[var(--brand-600)] bg-[var(--brand-600)] text-[var(--brand-contrast)]' : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50',
                     )}
                   >
                     <Icon className="w-4 h-4" />

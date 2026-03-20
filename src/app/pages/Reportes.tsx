@@ -168,10 +168,22 @@ export default function Reportes() {
 
   return (
     <div className="space-y-6 p-6">
-      <section className="overflow-hidden rounded-3xl border border-slate-200 bg-gradient-to-r from-white via-slate-50 to-sky-50 shadow-sm">
+      <section
+        className="overflow-hidden rounded-3xl border border-slate-200 shadow-sm"
+        style={{
+          backgroundImage: 'linear-gradient(90deg, #ffffff 0%, var(--brand-50) 65%, color-mix(in srgb, var(--brand-100) 65%, white) 100%)',
+        }}
+      >
         <div className="grid gap-6 px-6 py-6 lg:grid-cols-[1.2fr_0.8fr] lg:px-8">
           <div className="space-y-4">
-            <div className="inline-flex items-center gap-2 rounded-full border border-sky-200 bg-sky-100/70 px-3 py-1 text-xs font-medium uppercase tracking-[0.18em] text-sky-800">
+            <div
+              className="inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-medium uppercase tracking-[0.18em]"
+              style={{
+                border: '1px solid color-mix(in srgb, var(--brand-600) 20%, white)',
+                background: 'color-mix(in srgb, var(--brand-100) 65%, white)',
+                color: 'var(--brand-700)',
+              }}
+            >
               <Sparkles className="h-3.5 w-3.5" />
               Centro de analisis
             </div>
