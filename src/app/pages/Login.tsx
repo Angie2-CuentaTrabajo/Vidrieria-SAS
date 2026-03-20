@@ -8,8 +8,8 @@ import { setAuthSession } from '../lib/auth';
 
 export default function Login() {
   const navigate = useNavigate();
-  const [email, setEmail] = useState('admin@vidrieria.com');
-  const [password, setPassword] = useState('admin123');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleLogin = async (event: React.FormEvent) => {
@@ -50,16 +50,20 @@ export default function Login() {
             <p className="text-sm text-gray-600">Ingrese sus credenciales para acceder</p>
           </div>
 
-          <form onSubmit={handleLogin} className="space-y-4">
+          <form onSubmit={handleLogin} className="space-y-4" autoComplete="off">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">Usuario o email</label>
               <div className="relative">
                 <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input
                   type="email"
+                  name="login_email"
                   value={email}
                   onChange={(event) => setEmail(event.target.value)}
                   placeholder="Ingrese su email"
+                  autoComplete="off"
+                  autoCapitalize="none"
+                  spellCheck={false}
                   className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[color:var(--brand-600)] focus:border-transparent"
                 />
               </div>
@@ -71,9 +75,11 @@ export default function Login() {
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input
                   type="password"
+                  name="login_password"
                   value={password}
                   onChange={(event) => setPassword(event.target.value)}
                   placeholder="Ingrese su contrasena"
+                  autoComplete="new-password"
                   className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[color:var(--brand-600)] focus:border-transparent"
                 />
               </div>
