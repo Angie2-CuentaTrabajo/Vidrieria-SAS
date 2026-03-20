@@ -53,7 +53,7 @@
   --sidebar-ring: oklch(0.708 0 0);
 }
 
-:root[data-theme-palette='oceano'] {
+:root[data-content-palette='oceano'] {
   --brand-600: #2563eb;
   --brand-700: #1d4ed8;
   --brand-100: #dbeafe;
@@ -62,13 +62,9 @@
   --hero-from: #0f172a;
   --hero-via: #172554;
   --hero-to: #0c4a6e;
-  --sidebar-from: #0f172a;
-  --sidebar-to: #172554;
-  --sidebar-hover: rgba(255, 255, 255, 0.08);
-  --sidebar-border-strong: rgba(255, 255, 255, 0.08);
 }
 
-:root[data-theme-palette='esmeralda'] {
+:root[data-content-palette='esmeralda'] {
   --brand-600: #059669;
   --brand-700: #047857;
   --brand-100: #d1fae5;
@@ -77,13 +73,9 @@
   --hero-from: #052e2b;
   --hero-via: #065f46;
   --hero-to: #0f766e;
-  --sidebar-from: #052e2b;
-  --sidebar-to: #065f46;
-  --sidebar-hover: rgba(255, 255, 255, 0.08);
-  --sidebar-border-strong: rgba(255, 255, 255, 0.08);
 }
 
-:root[data-theme-palette='terracota'] {
+:root[data-content-palette='terracota'] {
   --brand-600: #c2410c;
   --brand-700: #9a3412;
   --brand-100: #ffedd5;
@@ -92,13 +84,9 @@
   --hero-from: #431407;
   --hero-via: #9a3412;
   --hero-to: #b45309;
-  --sidebar-from: #431407;
-  --sidebar-to: #9a3412;
-  --sidebar-hover: rgba(255, 255, 255, 0.08);
-  --sidebar-border-strong: rgba(255, 255, 255, 0.08);
 }
 
-:root[data-theme-palette='grafito'] {
+:root[data-content-palette='grafito'] {
   --brand-600: #334155;
   --brand-700: #1e293b;
   --brand-100: #e2e8f0;
@@ -107,6 +95,30 @@
   --hero-from: #0f172a;
   --hero-via: #1e293b;
   --hero-to: #334155;
+}
+
+:root[data-sidebar-palette='oceano'] {
+  --sidebar-from: #0f172a;
+  --sidebar-to: #172554;
+  --sidebar-hover: rgba(255, 255, 255, 0.08);
+  --sidebar-border-strong: rgba(255, 255, 255, 0.08);
+}
+
+:root[data-sidebar-palette='esmeralda'] {
+  --sidebar-from: #052e2b;
+  --sidebar-to: #065f46;
+  --sidebar-hover: rgba(255, 255, 255, 0.08);
+  --sidebar-border-strong: rgba(255, 255, 255, 0.08);
+}
+
+:root[data-sidebar-palette='terracota'] {
+  --sidebar-from: #431407;
+  --sidebar-to: #9a3412;
+  --sidebar-hover: rgba(255, 255, 255, 0.08);
+  --sidebar-border-strong: rgba(255, 255, 255, 0.08);
+}
+
+:root[data-sidebar-palette='grafito'] {
   --sidebar-from: #0f172a;
   --sidebar-to: #1e293b;
   --sidebar-hover: rgba(255, 255, 255, 0.08);

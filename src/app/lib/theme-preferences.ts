@@ -14,11 +14,16 @@ export type ThemePalette = {
   heroTo: string;
 };
 
+export type ThemePreferences = {
+  contentPaletteId: ThemePaletteId;
+  sidebarPaletteId: ThemePaletteId;
+};
+
 export const themePalettes: ThemePalette[] = [
   {
     id: 'oceano',
     name: 'Oceano',
-    description: 'Azules sobrios para un look moderno y profesional.',
+    description: 'Azules sobrios para una vista limpia y moderna.',
     accent: '#2563eb',
     accentSoft: '#dbeafe',
     accentStrong: '#1d4ed8',
@@ -31,7 +36,7 @@ export const themePalettes: ThemePalette[] = [
   {
     id: 'esmeralda',
     name: 'Esmeralda',
-    description: 'Verdes limpios para una apariencia fresca y comercial.',
+    description: 'Verdes suaves para una sensacion fresca y comercial.',
     accent: '#059669',
     accentSoft: '#d1fae5',
     accentStrong: '#047857',
@@ -44,7 +49,7 @@ export const themePalettes: ThemePalette[] = [
   {
     id: 'terracota',
     name: 'Terracota',
-    description: 'Tonos calidos con personalidad para una marca cercana.',
+    description: 'Tonos calidos con mucha presencia visual.',
     accent: '#c2410c',
     accentSoft: '#ffedd5',
     accentStrong: '#9a3412',
@@ -57,7 +62,7 @@ export const themePalettes: ThemePalette[] = [
   {
     id: 'grafito',
     name: 'Grafito',
-    description: 'Neutro elegante con acento oscuro y serio.',
+    description: 'Neutro elegante para zonas que deben cansar menos la vista.',
     accent: '#334155',
     accentSoft: '#e2e8f0',
     accentStrong: '#1e293b',
@@ -69,25 +74,55 @@ export const themePalettes: ThemePalette[] = [
   },
 ];
 
-const STORAGE_KEY = 'vidrieria-theme-palette';
+const LEGACY_STORAGE_KEY = 'vidrieria-theme-palette';
+const CONTENT_STORAGE_KEY = 'vidrieria-theme-content-palette';
+const SIDEBAR_STORAGE_KEY = 'vidrieria-theme-sidebar-palette';
 
 export function getThemePaletteById(id?: string | null) {
   return themePalettes.find((palette) => palette.id === id) || themePalettes[0];
 }
 
-export function getStoredThemePalette() {
+export function getStoredThemePreferences(): ThemePreferences {
   if (typeof window === 'undefined') {
-    return themePalettes[0];
+    return {
+      contentPaletteId: 'oceano',
+      sidebarPaletteId: 'grafito',
+    };
   }
 
-  return getThemePaletteById(window.localStorage.getItem(STORAGE_KEY));
+  const legacyPalette = window.localStorage.getItem(LEGACY_STORAGE_KEY) as ThemePaletteId | null;
+  const contentPaletteId = (window.localStorage.getItem(CONTENT_STORAGE_KEY) as ThemePaletteId | null) || legacyPalette || 'oceano';
+  const sidebarPaletteId = (window.localStorage.getItem(SIDEBAR_STORAGE_KEY) as ThemePaletteId | null) || legacyPalette || 'grafito';
+
+  return {
+    contentPaletteId: getThemePaletteById(contentPaletteId).id,
+    sidebarPaletteId: getThemePaletteById(sidebarPaletteId).id,
+  };
 }
 
-export function applyThemePalette(paletteId: ThemePaletteId) {
+export function applyThemePreferences(preferences: ThemePreferences) {
   if (typeof document === 'undefined') {
     return;
   }
 
-  document.documentElement.setAttribute('data-theme-palette', paletteId);
-  window.localStorage.setItem(STORAGE_KEY, paletteId);
+  document.documentElement.setAttribute('data-content-palette', preferences.contentPaletteId);
+  document.documentElement.setAttribute('data-sidebar-palette', preferences.sidebarPaletteId);
+  window.localStorage.setItem(CONTENT_STORAGE_KEY, preferences.contentPaletteId);
+  window.localStorage.setItem(SIDEBAR_STORAGE_KEY, preferences.sidebarPaletteId);
+}
+
+export function applyContentPalette(contentPaletteId: ThemePaletteId) {
+  const current = getStoredThemePreferences();
+  applyThemePreferences({
+    ...current,
+    contentPaletteId,
+  });
+}
+
+export function applySidebarPalette(sidebarPaletteId: ThemePaletteId) {
+  const current = getStoredThemePreferences();
+  applyThemePreferences({
+    ...current,
+    sidebarPaletteId,
+  });
 }

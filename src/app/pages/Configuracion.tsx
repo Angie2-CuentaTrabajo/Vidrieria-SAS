@@ -18,8 +18,9 @@ import {
 } from '../lib/configuracion-api';
 import { getAuthSession } from '../lib/auth';
 import {
-  applyThemePalette,
-  getStoredThemePalette,
+  applyContentPalette,
+  applySidebarPalette,
+  getStoredThemePreferences,
   themePalettes,
   type ThemePaletteId,
 } from '../lib/theme-preferences';
@@ -64,7 +65,9 @@ export default function Configuracion() {
   const [isUserModalOpen, setIsUserModalOpen] = useState(false);
   const [editingSystemUser, setEditingSystemUser] = useState<UsuarioSistema | null>(null);
   const [userForm, setUserForm] = useState(defaultUserForm);
-  const [themePalette, setThemePalette] = useState<ThemePaletteId>(getStoredThemePalette().id);
+  const storedTheme = getStoredThemePreferences();
+  const [contentPalette, setContentPalette] = useState<ThemePaletteId>(storedTheme.contentPaletteId);
+  const [sidebarPalette, setSidebarPalette] = useState<ThemePaletteId>(storedTheme.sidebarPaletteId);
 
   const currentSession = getAuthSession();
   const isAdmin = currentSession?.user.rol === 'ADMIN';
@@ -223,10 +226,16 @@ export default function Configuracion() {
     }
   }
 
-  function handlePaletteChange(paletteId: ThemePaletteId) {
-    setThemePalette(paletteId);
-    applyThemePalette(paletteId);
-    toast.success('Colores del sistema actualizados');
+  function handleContentPaletteChange(paletteId: ThemePaletteId) {
+    setContentPalette(paletteId);
+    applyContentPalette(paletteId);
+    toast.success('Color de la vista principal actualizado');
+  }
+
+  function handleSidebarPaletteChange(paletteId: ThemePaletteId) {
+    setSidebarPalette(paletteId);
+    applySidebarPalette(paletteId);
+    toast.success('Color del menu lateral actualizado');
   }
 
   return (
@@ -290,20 +299,24 @@ export default function Configuracion() {
             </div>
             <div>
               <CardTitle>Colores del sistema</CardTitle>
-              <p className="text-sm text-gray-600">Elige la paleta visual para dashboard, botones y pantallas principales.</p>
+              <p className="text-sm text-gray-600">Puedes usar un color distinto para el menu lateral y otro para la vista principal.</p>
             </div>
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
+          <div>
+            <h3 className="text-base font-semibold text-gray-900">Vista principal</h3>
+            <p className="mt-1 text-sm text-gray-600">Afecta dashboard, reportes, botones y paneles principales.</p>
+          </div>
           <div className="grid gap-4 md:grid-cols-2">
             {themePalettes.map((palette) => {
-              const isActive = themePalette === palette.id;
+              const isActive = contentPalette === palette.id;
 
               return (
                 <button
-                  key={palette.id}
+                  key={`content-${palette.id}`}
                   type="button"
-                  onClick={() => handlePaletteChange(palette.id)}
+                  onClick={() => handleContentPaletteChange(palette.id)}
                   className={`rounded-2xl border p-4 text-left transition ${
                     isActive ? 'border-gray-900 shadow-md' : 'border-gray-200 hover:border-gray-300'
                   }`}
@@ -333,8 +346,49 @@ export default function Configuracion() {
               );
             })}
           </div>
+          <div className="border-t border-gray-200 pt-4">
+            <h3 className="text-base font-semibold text-gray-900">Menu lateral</h3>
+            <p className="mt-1 text-sm text-gray-600">Ideal para dejarlo mas sobrio y que descanse mejor la vista.</p>
+          </div>
+          <div className="grid gap-4 md:grid-cols-2">
+            {themePalettes.map((palette) => {
+              const isActive = sidebarPalette === palette.id;
+
+              return (
+                <button
+                  key={`sidebar-${palette.id}`}
+                  type="button"
+                  onClick={() => handleSidebarPaletteChange(palette.id)}
+                  className={`rounded-2xl border p-4 text-left transition ${
+                    isActive ? 'border-gray-900 shadow-md' : 'border-gray-200 hover:border-gray-300'
+                  }`}
+                >
+                  <div
+                    className="mb-4 h-24 rounded-xl"
+                    style={{
+                      backgroundImage: `linear-gradient(180deg, ${palette.heroFrom}, ${palette.heroVia})`,
+                    }}
+                  />
+                  <div className="flex items-center justify-between gap-3">
+                    <div>
+                      <p className="font-semibold text-gray-900">{palette.name}</p>
+                      <p className="mt-1 text-sm text-gray-600">{palette.description}</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="h-5 w-5 rounded-full border border-white shadow-sm" style={{ backgroundColor: palette.heroFrom }} />
+                      <span className="h-5 w-5 rounded-full border border-white shadow-sm" style={{ backgroundColor: palette.heroVia }} />
+                    </div>
+                  </div>
+                  <div className="mt-4 flex items-center justify-between text-sm">
+                    <span className="text-gray-500">{isActive ? 'Paleta activa' : 'Usar esta paleta'}</span>
+                    {isActive ? <span className="font-medium text-gray-900">Seleccionada</span> : null}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
           <div className="rounded-2xl border border-gray-200 bg-gray-50 p-4 text-sm text-gray-600">
-            Este cambio se guarda en el navegador actual. Si luego quieres, puedo hacer que tambien se guarde en la base de datos para que todos vean el mismo color por defecto.
+            Estos cambios se guardan en el navegador actual. Si luego quieres, puedo hacer que tambien se guarden en la base de datos para que todos vean la misma combinacion por defecto.
           </div>
         </CardContent>
       </Card>
