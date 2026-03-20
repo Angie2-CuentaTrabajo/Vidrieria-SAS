@@ -11,7 +11,7 @@ const app = express();
 const port = Number(process.env.API_PORT || 3001);
 
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '12mb' }));
 
 const AUTH_SECRET = process.env.AUTH_SECRET || 'vidrieria-dev-secret';
 const AUTH_TOKEN_TTL_MS = 1000 * 60 * 60 * 12;
@@ -1073,35 +1073,28 @@ app.put('/api/configuracion', async (req, res) => {
       return res.status(400).json({ message: 'El stock mínimo debe ser un número válido.' });
     }
 
-      const configuracion = await prisma.configuracionNegocio.upsert({
-        where: { id: current.id },
-        create: {
-          id: current.id,
-          nombreComercial: String(nombreComercial).trim(),
-          moneda: moneda || 'PEN',
-          logoUrl: logoUrl ? String(logoUrl).trim() : null,
-          contentPalette: contentPalette || current.contentPalette || 'oceano',
-          sidebarPalette: sidebarPalette || current.sidebarPalette || 'grafito',
-          contentCustomColor: contentCustomColor ? String(contentCustomColor).trim() : null,
-          sidebarCustomColor: sidebarCustomColor ? String(sidebarCustomColor).trim() : null,
-          stockMinimoPorDefecto: stockMinimo,
-        },
-        data: {
-          nombreComercial: String(nombreComercial).trim(),
-          moneda: moneda || 'PEN',
-          logoUrl: logoUrl ? String(logoUrl).trim() : null,
-          contentPalette: contentPalette || current.contentPalette || 'oceano',
+      const normalizedMoneda = moneda === 'USD' ? 'USD' : 'PEN';
+      const configuracionData = {
+        nombreComercial: String(nombreComercial).trim(),
+        moneda: normalizedMoneda,
+        logoUrl: logoUrl ? String(logoUrl).trim() : null,
+        contentPalette: contentPalette || current.contentPalette || 'oceano',
         sidebarPalette: sidebarPalette || current.sidebarPalette || 'grafito',
         contentCustomColor: contentCustomColor ? String(contentCustomColor).trim() : null,
         sidebarCustomColor: sidebarCustomColor ? String(sidebarCustomColor).trim() : null,
         stockMinimoPorDefecto: stockMinimo,
-      },
-    });
+      };
+
+      const configuracion = await prisma.configuracionNegocio.update({
+        where: { id: current.id },
+        data: configuracionData,
+      });
 
     res.json({ negocio: configuracion });
   } catch (error) {
     console.error('Error al actualizar configuracion:', error);
-    res.status(500).json({ message: 'No se pudo actualizar la configuración.' });
+    const message = error instanceof Error ? error.message : 'Error interno del servidor.';
+    res.status(500).json({ message: `No se pudo actualizar la configuración. ${message}` });
   }
 });
 
