@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+﻿import { useEffect, useState } from 'react';
 import { Search, Plus, Eye, Edit2, Trash2, Users } from 'lucide-react';
 import { Card, CardContent } from '../components/ui/card';
 import { Button } from '../components/ui/button';
@@ -61,8 +61,8 @@ export default function Clientes() {
 
   const filteredClientes = clientes.filter((cliente) =>
     cliente.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    cliente.telefono.includes(searchTerm) ||
-    cliente.direccion.toLowerCase().includes(searchTerm.toLowerCase()),
+    (cliente.telefono || '').includes(searchTerm) ||
+    (cliente.direccion || '').toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   const handleOpenModal = (cliente?: Cliente) => {
@@ -70,8 +70,8 @@ export default function Clientes() {
       setEditingCliente(cliente);
       setFormData({
         nombre: cliente.nombre,
-        telefono: cliente.telefono,
-        direccion: cliente.direccion,
+        telefono: cliente.telefono || '',
+        direccion: cliente.direccion || '',
         documento: cliente.documento || '',
         observacion: cliente.observacion || '',
       });
@@ -268,10 +268,10 @@ export default function Clientes() {
                         )}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                        {cliente.telefono}
+                        {cliente.telefono || '-'}
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-600">
-                        {cliente.direccion}
+                        {cliente.direccion || '-'}
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-600">
                         {cliente.observacion || '-'}
@@ -325,7 +325,7 @@ export default function Clientes() {
       >
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="rounded-2xl border border-sky-100 bg-sky-50 px-4 py-3 text-sm text-sky-900">
-            Registra aqui los datos base del cliente para poder crear trabajos, pagos y seguimiento sin repetir informacion despues.
+            Registra aquí los datos base del cliente para poder crear trabajos, pagos y seguimiento sin repetir información después.
           </div>
           <Input
             label="Nombre completo"
@@ -337,22 +337,20 @@ export default function Clientes() {
           />
 
           <Input
-            label="Teléfono"
-            helperText="Numero principal para llamadas, WhatsApp o coordinaciones."
+            label="Teléfono (opcional)"
+            helperText="Si lo tienes, sirve para llamadas, WhatsApp o coordinaciones."
             type="tel"
             value={formData.telefono}
             onChange={(e) => setFormData({ ...formData, telefono: e.target.value })}
             placeholder="Ej: 987654321"
-            required
           />
 
           <Input
-            label="Dirección"
-            helperText="Direccion del cliente o lugar frecuente de instalacion."
+            label="Dirección (opcional)"
+            helperText="Puede ser la dirección del cliente o un lugar frecuente de instalación."
             value={formData.direccion}
             onChange={(e) => setFormData({ ...formData, direccion: e.target.value })}
             placeholder="Ej: Av. Principal 123, Lima"
-            required
           />
 
           <Input
@@ -365,7 +363,7 @@ export default function Clientes() {
 
           <Textarea
             label="Observación (opcional)"
-            helperText="Anota datos utiles como referencia de ubicacion, horario o preferencia del cliente."
+            helperText="Anota datos útiles como referencia de ubicación, horario o preferencia del cliente."
             value={formData.observacion}
             onChange={(e) => setFormData({ ...formData, observacion: e.target.value })}
             placeholder="Notas adicionales sobre el cliente"
@@ -385,3 +383,4 @@ export default function Clientes() {
     </div>
   );
 }
+

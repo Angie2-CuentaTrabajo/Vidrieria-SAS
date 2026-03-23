@@ -132,6 +132,46 @@ async function ensureConfiguracionNegocio() {
   });
 }
 
+function buildFallbackPwaSvg(label = 'SV') {
+  const initials = String(label || 'SV')
+    .replace(/[^A-Za-z0-9 ]/g, ' ')
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((fragment) => fragment.charAt(0).toUpperCase())
+    .join('') || 'SV';
+
+  return `<?xml version="1.0" encoding="UTF-8"?>
+  <svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+    <defs>
+      <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#0f766e"/>
+        <stop offset="100%" stop-color="#0f172a"/>
+      </linearGradient>
+    </defs>
+    <rect width="512" height="512" rx="120" fill="url(#bg)"/>
+    <text x="256" y="286" text-anchor="middle" font-family="Arial, sans-serif" font-size="152" font-weight="700" fill="#ffffff">${initials}</text>
+  </svg>`;
+}
+
+function sendPwaLogo(req, res, logoUrl, nombreComercial) {
+  if (logoUrl && String(logoUrl).startsWith('data:image/')) {
+    const matches = String(logoUrl).match(/^data:(image\/[a-zA-Z0-9.+-]+);base64,(.+)$/);
+
+    if (matches) {
+      const [, contentType, base64] = matches;
+      return res.type(contentType).send(Buffer.from(base64, 'base64'));
+    }
+  }
+
+  if (logoUrl && /^https?:\/\//i.test(String(logoUrl))) {
+    return res.redirect(String(logoUrl));
+  }
+
+  const fallbackSvg = buildFallbackPwaSvg(nombreComercial);
+  return res.type('image/svg+xml').send(fallbackSvg);
+}
+
 function mapCliente(cliente) {
   const saldoPendiente = cliente.trabajos.reduce(
     (sum, trabajo) => sum + Number(trabajo.saldo ?? 0),
@@ -1114,6 +1154,50 @@ app.get('/api/configuracion/publica', async (_req, res) => {
   } catch (error) {
     console.error('Error al cargar configuración pública:', error);
     res.status(500).json({ message: 'No se pudo cargar la configuración pública.' });
+  }
+});
+
+app.get('/api/pwa-icon', async (req, res) => {
+  try {
+    const configuracion = await ensureConfiguracionNegocio();
+    return sendPwaLogo(req, res, configuracion.logoUrl, configuracion.nombreComercial);
+  } catch (error) {
+    console.error('Error al cargar icono PWA:', error);
+    return res.status(500).json({ message: 'No se pudo cargar el icono de la aplicación.' });
+  }
+});
+
+app.get('/api/manifest.webmanifest', async (_req, res) => {
+  try {
+    const configuracion = await ensureConfiguracionNegocio();
+    const nombre = configuracion.nombreComercial || 'Sistema de Gestión';
+
+    res.type('application/manifest+json').send({
+      name: nombre,
+      short_name: nombre.slice(0, 12),
+      description: `Aplicación de gestión para ${nombre}.`,
+      start_url: '/',
+      scope: '/',
+      display: 'standalone',
+      orientation: 'portrait',
+      background_color: '#ffffff',
+      theme_color: '#0f766e',
+      icons: [
+        {
+          src: '/api/pwa-icon?size=192',
+          sizes: '192x192',
+          purpose: 'any',
+        },
+        {
+          src: '/api/pwa-icon?size=512',
+          sizes: '512x512',
+          purpose: 'any maskable',
+        },
+      ],
+    });
+  } catch (error) {
+    console.error('Error al cargar manifest PWA:', error);
+    res.status(500).json({ message: 'No se pudo cargar el manifest de la aplicación.' });
   }
 });
 
@@ -2816,15 +2900,15 @@ app.post('/api/clientes', async (req, res) => {
   try {
     const { nombre, telefono, direccion, documento, observacion } = req.body ?? {};
 
-    if (!nombre || !telefono || !direccion) {
-      return res.status(400).json({ message: 'Nombre, telÃ©fono y direcciÃ³n son obligatorios.' });
+    if (!nombre) {
+      return res.status(400).json({ message: 'El nombre del cliente es obligatorio.' });
     }
 
     const cliente = await prisma.cliente.create({
       data: {
         nombre: String(nombre).trim(),
-        telefono: String(telefono).trim(),
-        direccion: String(direccion).trim(),
+        telefono: telefono ? String(telefono).trim() : '',
+        direccion: direccion ? String(direccion).trim() : '',
         documento: documento ? String(documento).trim() : null,
         observacion: observacion ? String(observacion).trim() : null,
       },
@@ -2854,8 +2938,8 @@ app.put('/api/clientes/:id', async (req, res) => {
     const { id } = req.params;
     const { nombre, telefono, direccion, documento, observacion } = req.body ?? {};
 
-    if (!nombre || !telefono || !direccion) {
-      return res.status(400).json({ message: 'Nombre, telÃ©fono y direcciÃ³n son obligatorios.' });
+    if (!nombre) {
+      return res.status(400).json({ message: 'El nombre del cliente es obligatorio.' });
     }
 
     const clienteExistente = await prisma.cliente.findUnique({
@@ -2871,8 +2955,8 @@ app.put('/api/clientes/:id', async (req, res) => {
       where: { id },
       data: {
         nombre: String(nombre).trim(),
-        telefono: String(telefono).trim(),
-        direccion: String(direccion).trim(),
+        telefono: telefono ? String(telefono).trim() : '',
+        direccion: direccion ? String(direccion).trim() : '',
         documento: documento ? String(documento).trim() : null,
         observacion: observacion ? String(observacion).trim() : null,
       },

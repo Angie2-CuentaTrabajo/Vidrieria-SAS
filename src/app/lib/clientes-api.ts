@@ -1,8 +1,8 @@
-export interface Cliente {
+﻿export interface Cliente {
   id: string;
   nombre: string;
-  telefono: string;
-  direccion: string;
+  telefono?: string | null;
+  direccion?: string | null;
   documento?: string | null;
   observacion?: string | null;
   saldoPendiente: number;
@@ -34,8 +34,8 @@ export interface ClienteDetalle extends Cliente {
 
 export interface ClientePayload {
   nombre: string;
-  telefono: string;
-  direccion: string;
+  telefono?: string;
+  direccion?: string;
   documento: string;
   observacion: string;
 }
@@ -94,3 +94,4 @@ export async function deleteCliente(id: string) {
 
   return parseResponse<void>(response);
 }
+
