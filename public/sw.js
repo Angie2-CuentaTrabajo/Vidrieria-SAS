@@ -1,5 +1,4 @@
-self.addEventListener('install', (event) => {
-self.addEventListener('install', (event) => {
+﻿self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open('vidrieria-shell-v1').then(async (cache) => {
       await cache.addAll(['/']);
