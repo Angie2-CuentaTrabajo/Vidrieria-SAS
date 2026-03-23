@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
-import { Package, Lock, User, Eye, EyeOff, Download } from 'lucide-react';
+import { Package, Lock, User, Eye, EyeOff } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { toast } from 'sonner';
 import { login } from '../lib/auth-api';
 import { setAuthSession } from '../lib/auth';
-import { usePwaInstall } from '../lib/pwa-install';
 
 type PublicLoginConfig = {
   negocio?: {
@@ -22,7 +21,6 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [nombreComercial, setNombreComercial] = useState('Vidriería');
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
-  const { canInstall, promptInstall } = usePwaInstall();
 
   useEffect(() => {
     let isMounted = true;
@@ -68,18 +66,6 @@ export default function Login() {
       toast.error(error instanceof Error ? error.message : 'No se pudo iniciar sesión');
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleInstall = async () => {
-    const result = await promptInstall();
-
-    if (result.outcome === 'accepted') {
-      toast.success('La aplicación se está instalando.');
-    } else if (result.outcome === 'dismissed') {
-      toast.info('La instalación fue cancelada.');
-    } else {
-      toast.info('La instalación aún no está disponible en este navegador.');
     }
   };
 
@@ -159,13 +145,6 @@ export default function Login() {
             <Button type="submit" variant="primary" className="w-full py-2.5" disabled={loading}>
               {loading ? 'Ingresando...' : 'Ingresar'}
             </Button>
-
-            {canInstall ? (
-              <Button type="button" variant="outline" className="w-full py-2.5" onClick={handleInstall}>
-                <Download className="h-4 w-4" />
-                Instalar app
-              </Button>
-            ) : null}
           </form>
         </div>
 

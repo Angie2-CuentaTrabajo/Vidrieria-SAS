@@ -13,7 +13,6 @@ import {
   Calendar,
   Bell,
   Search,
-  Download,
 } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { useEffect, useState } from 'react';
@@ -21,8 +20,6 @@ import { clearAuthSession, getAuthSession, type AuthUser } from '../lib/auth';
 import { getMe } from '../lib/auth-api';
 import { getConfiguracion } from '../lib/configuracion-api';
 import { applyThemePreferences, type ThemePaletteId } from '../lib/theme-preferences';
-import { usePwaInstall } from '../lib/pwa-install';
-import { toast } from 'sonner';
 
 const menuItems = [
   { path: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
@@ -42,7 +39,6 @@ export default function Layout() {
   const navigate = useNavigate();
   const [notifications] = useState(3);
   const [user, setUser] = useState<AuthUser | null>(() => getAuthSession()?.user || null);
-  const { canInstall, promptInstall } = usePwaInstall();
   const [negocio, setNegocio] = useState<{ nombreComercial: string; logoUrl?: string | null }>({
     nombreComercial: 'Vidriería',
     logoUrl: null,
@@ -83,18 +79,6 @@ export default function Layout() {
   const handleLogout = () => {
     clearAuthSession();
     navigate('/login');
-  };
-
-  const handleInstall = async () => {
-    const result = await promptInstall();
-
-    if (result.outcome === 'accepted') {
-      toast.success('La aplicación se está instalando.');
-    } else if (result.outcome === 'dismissed') {
-      toast.info('La instalación fue cancelada.');
-    } else {
-      toast.info('La instalación aún no está disponible en este navegador.');
-    }
   };
 
   return (
@@ -192,17 +176,6 @@ export default function Layout() {
             </div>
 
             <div className="flex items-center justify-between gap-4 lg:justify-end">
-              {canInstall ? (
-                <button
-                  type="button"
-                  onClick={handleInstall}
-                  className="hidden items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 lg:flex"
-                >
-                  <Download className="h-4 w-4" />
-                  Instalar app
-                </button>
-              ) : null}
-
               <button className="relative rounded-lg p-2 text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900">
                 <Bell className="w-5 h-5" />
                 {notifications > 0 ? <span className="absolute right-1 top-1 h-2 w-2 rounded-full bg-red-500" /> : null}
@@ -222,17 +195,6 @@ export default function Layout() {
 
           <nav className="-mx-1 mt-4 overflow-x-auto lg:hidden">
             <div className="flex min-w-max gap-2 px-1 pb-1">
-              {canInstall ? (
-                <button
-                  type="button"
-                  onClick={handleInstall}
-                  className="flex items-center gap-2 rounded-full border border-gray-200 bg-white px-3 py-2 text-sm font-medium whitespace-nowrap text-gray-700 hover:bg-gray-50"
-                >
-                  <Download className="w-4 h-4" />
-                  <span>Instalar app</span>
-                </button>
-              ) : null}
-
               {menuItems.map((item) => {
                 const Icon = item.icon;
                 const isActive = isActivePath(item.path);
