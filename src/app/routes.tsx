@@ -3,7 +3,6 @@ import Login from './pages/Login';
 import Layout from './components/Layout';
 import Dashboard from './pages/Dashboard';
 import RegistroRapido from './pages/RegistroRapido';
-import RegistroRapido2 from './pages/RegistroRapido2';
 import Clientes from './pages/Clientes';
 import ClienteDetalle from './pages/ClienteDetalle';
 import Trabajos from './pages/Trabajos';
@@ -36,7 +35,6 @@ export const router = createBrowserRouter([
         children: [
           { index: true, Component: Dashboard },
           { path: 'registro', Component: RegistroRapido },
-          { path: 'registro-2', Component: RegistroRapido2 },
           { path: 'clientes', Component: Clientes },
           { path: 'clientes/:id', Component: ClienteDetalle },
           { path: 'cotizaciones', element: <Navigate to="/dashboard/trabajos" replace /> },
