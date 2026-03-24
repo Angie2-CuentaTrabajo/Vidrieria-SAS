@@ -220,7 +220,7 @@ export default function TrabajoDetalle() {
           </div>
           <p className="text-sm text-gray-600">{trabajo.descripcion}</p>
         </div>
-        <Button variant="outline" onClick={() => setIsModalEditOpen(true)} className="w-full sm:w-auto">
+        <Button variant="outline" onClick={() => setIsModalEditOpen(true)} className="w-full sm:w-auto" disabled={isTrabajoCancelado}>
           <Edit2 className="h-4 w-4" />
           Editar
         </Button>
@@ -314,15 +314,24 @@ export default function TrabajoDetalle() {
           <Card>
             <CardHeader><CardTitle>Acciones</CardTitle></CardHeader>
             <CardContent className="space-y-2">
-              <Button className="w-full" onClick={() => setIsModalPagoOpen(true)}><CreditCard className="h-4 w-4" />Registrar pago</Button>
+              <Button className="w-full" onClick={() => setIsModalPagoOpen(true)} disabled={isTrabajoCancelado}>
+                <CreditCard className="h-4 w-4" />
+                Registrar pago
+              </Button>
               <Button variant="outline" className="w-full" onClick={() => handleCambiarEstado('TERMINADO')} disabled={isTrabajoCancelado}>Marcar como terminado</Button>
               <Button variant="outline" className="w-full" onClick={() => handleCambiarEstado('ENTREGADO')} disabled={isTrabajoCancelado}>Marcar como entregado</Button>
-              <Button variant="danger" className="w-full" onClick={() => setIsConfirmCancelOpen(true)} disabled={isTrabajoCancelado}>
-                {isTrabajoCancelado ? 'Trabajo cancelado' : 'Cancelar trabajo'}
-              </Button>
+              {isTrabajoCancelado ? (
+                <Button variant="default" className="w-full" onClick={() => handleCambiarEstado('PENDIENTE')}>
+                  Reactivar trabajo
+                </Button>
+              ) : (
+                <Button variant="danger" className="w-full" onClick={() => setIsConfirmCancelOpen(true)}>
+                  Cancelar trabajo
+                </Button>
+              )}
               {isTrabajoCancelado ? (
                 <p className="rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-xs text-rose-800">
-                  Este trabajo ya fue cancelado. Por seguridad ya no puede pasar a terminado o entregado.
+                  Este trabajo está cancelado. No acepta pagos ni cambios a terminado o entregado hasta que lo reactives.
                 </p>
               ) : null}
             </CardContent>

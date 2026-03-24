@@ -2295,8 +2295,8 @@ app.patch('/api/trabajos/:id/estado', async (req, res) => {
       return res.status(404).json({ message: 'Trabajo no encontrado.' });
     }
 
-    if (trabajoExistente.estado === 'CANCELADO' && estado !== 'CANCELADO') {
-      return res.status(400).json({ message: 'Un trabajo cancelado ya no puede pasar a terminado o entregado.' });
+    if (trabajoExistente.estado === 'CANCELADO' && !['CANCELADO', 'PENDIENTE'].includes(estado)) {
+      return res.status(400).json({ message: 'Un trabajo cancelado solo puede mantenerse cancelado o reactivarse a pendiente.' });
     }
 
     await prisma.trabajo.update({
